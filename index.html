@@ -104,11 +104,11 @@ table.list td.num{text-align:right}
 .modal .foot{display:flex;justify-content:flex-end;gap:10px;margin-top:8px}
 #toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:12px 22px;border-radius:8px;display:none;z-index:200;font-size:16px}
 .hidden{display:none!important}
+button:disabled{opacity:.45;cursor:not-allowed}
 #storageBanner .sb-err{background:#fdecea;border:2px solid var(--bad);color:#7a1f16;border-radius:8px;padding:12px 14px;margin-bottom:12px;font-size:15px}
 #storageInfo th{width:9em;white-space:nowrap}
 /* 休業日（日曜・祝日・未指定の土曜・休業日） */
 table.shift th.closed{background:#dcdcdc;color:#888}
-table.shift th.closed.home{background:#efe3c2;color:#7a5f1e}
 table.shift th.hol{color:var(--bad)}
 table.shift td.c.closed{background:#d9d9d9;cursor:not-allowed}
 table.shift td.c.closed.on{background:#f4b6b6;color:var(--bad)}
@@ -125,8 +125,6 @@ table.mcal td.k-wd{background:#fff}
 table.mcal td.k-sun,table.mcal td.k-hol{background:#ffecec;color:var(--bad)}
 table.mcal td.k-satoff{background:#eef0f3;color:#666}
 table.mcal td.k-satopen{background:#dbe9ff;color:#1d4f9a}
-table.mcal td.k-sathome{background:#f6efdc;color:#7a5f1e}
-select.satsel{margin-top:8px;font-size:16px;padding:5px 6px;font-family:inherit;border:1px solid #aab;border-radius:5px;width:100%;max-width:130px}
 table.mcal td.k-closed{background:#e4e4e4;color:#666}
 table.mcal label.ck{display:flex;align-items:center;gap:6px;margin-top:8px;cursor:pointer;font-size:15px;color:#222}
 table.mcal label.ck input{width:22px;height:22px}
@@ -146,42 +144,8 @@ table.mcal label.ck input{width:22px;height:22px}
 .hn-steps h3{font-size:18px;margin:0 0 10px;color:var(--text);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .hn-no{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:var(--blue);color:#fff;font-size:16px}
 #hnYm{font-size:18px;padding:6px 8px;font-family:inherit}
-.hn-sat{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:6px 0}
-.hn-d{font-size:18px;font-weight:bold;min-width:6.5em}
-.hn-sat.hol .hn-d{color:var(--bad)}
-.hn-seg{display:inline-flex}
-.hn-seg button{border-radius:0;padding:8px 16px;font-size:16px;border-color:#aab;color:#444}
-.hn-seg button:first-child{border-radius:6px 0 0 6px}
-.hn-seg button:last-child{border-radius:0 6px 6px 0}
-.hn-seg button+button{border-left:none}
-.hn-seg button.on.m-off{background:#666;color:#fff;border-color:#666}
-.hn-seg button.on.m-open{background:var(--blue);color:#fff;border-color:var(--blue)}
-.hn-seg button.on.m-home{background:#b08d3c;color:#fff;border-color:#b08d3c}
 .hn-preview{max-width:900px}
 #hnCanvas{width:100%;display:block;box-shadow:0 1px 6px rgba(0,0,0,.18);border:1px solid #ddd}
-/* 土曜日在宅予定 */
-table.hp-calt td.hp-sat{cursor:pointer;background:#f4f4f4;color:#555}
-table.hp-calt td.hp-sat:hover{outline:2px solid #b08d3c;outline-offset:-2px}
-table.hp-calt td.hp-sat.on{background:#f3e7c6;color:#5e4510}
-table.hp-calt td.hp-sat .lb2{font-size:13px;font-weight:bold;margin-top:2px}
-table.hp-calt td.hp-off{background:#fbeeee;color:var(--bad)}
-table.hp-calt td{height:84px}
-table.hp-mx th,table.hp-mx td{text-align:center;white-space:nowrap}
-table.hp-mx th:first-child,table.hp-mx td:first-child{text-align:left;position:sticky;left:0;background:#fff;z-index:1}
-table.hp-mx th:first-child{background:#eef2f7}
-.hp-col div:first-child{font-size:16px;margin-bottom:4px}
-.hp-colbtn{display:flex;gap:4px;justify-content:center;margin-bottom:4px}
-.hp-colbtn button,.hp-col .danger{padding:4px 8px;font-size:13px}
-td.hp-cell label{display:inline-flex;align-items:center;gap:4px;cursor:pointer;padding:4px 8px}
-td.hp-cell input{width:20px;height:20px}
-td.hp-cell.on{background:#f3e7c6;font-weight:bold;color:#5e4510}
-.hp-warn{color:var(--bad);font-weight:bold}
-tr.hp-sum td{background:#f7f9fb;font-weight:bold}
-.hp-st{padding:10px 12px;border-radius:6px;margin-bottom:10px;font-weight:bold}
-.hp-st.warn{background:#fff4db;color:#8a5a00;border:1px solid #f0d08a}
-.hp-st.ok{background:#eaf7ee;color:var(--ok);border:1px solid #9bd1ae}
-button:disabled{opacity:.45;cursor:not-allowed}
-table.shift td.c.closed.homeplan{background:#f3e7c6;color:#7a5a12;font-weight:bold;font-size:14px}
 /* 選択チェック */
 input.sel{width:22px;height:22px;vertical-align:middle;cursor:pointer}
 .selbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:12px 0}
@@ -242,7 +206,7 @@ input.sel{width:22px;height:22px;vertical-align:middle;cursor:pointer}
         <button class="primary big" id="btnAuto">自動シフト作成</button>
         <button class="primary big" id="btnPng">PNG画像を出力</button>
         <button class="big" id="btnCal2">通所日の設定</button>
-        <button class="big" id="btnHome2">土曜日在宅予定</button>
+        <button class="big" id="btnHome2">土曜日在宅日のお知らせ</button>
         <button class="big" id="btnUsers2">利用者管理</button>
         <button class="small danger" id="btnClearMonth">この月のシフトを消去</button>
       </div>
@@ -252,7 +216,7 @@ input.sel{width:22px;height:22px;vertical-align:middle;cursor:pointer}
     <div class="viewtabs">
       <button data-view="all" class="active">全体シフト</button>
       <button data-view="person">個別カレンダー</button>
-      <button data-view="home">土曜日在宅予定</button>
+      <button data-view="home">土曜日在宅日のお知らせ</button>
     </div>
 
     <div id="viewPerson" class="panel hidden">
@@ -277,37 +241,20 @@ input.sel{width:22px;height:22px;vertical-align:middle;cursor:pointer}
           </div>
         </section>
         <section>
-          <h3><span class="hn-no">2</span>在宅作業をする土曜日を選ぶ <span class="hint" id="hnCount"></span></h3>
-          <p class="hint" style="margin:0 0 8px">土曜日の枠を押すと「在宅作業日」になります（もう一度押すと休み）。土曜日は事業所への通所日にはなりません。</p>
-          <div class="list-wrap"><table class="mcal hp-calt" id="hpCal"></table></div>
+          <h3><span class="hn-no">2</span>土曜日の通所日を確認する</h3>
+          <div id="hnDays"></div>
+          <p class="hint" style="margin:6px 0 0">「通所日の設定」で通所日にした土曜日が、自動でお知らせに載ります。</p>
+          <div id="hnEmpty" class="notice hidden">土曜日を通所日に設定すると、お知らせを作成できます。
+            <div class="actions" style="margin-top:6px"><button class="small" id="hnGoCal">通所日の設定を開く</button></div></div>
         </section>
-        <section>
-          <h3><span class="hn-no">3</span>在宅作業をする利用者を選んで確定する</h3>
-          <p class="hint" style="margin:0 0 8px">日付ごとにチェックを付けます。チェックしただけでは保存されません。最後に「確認して確定」を押してください。平日の通所シフトには影響しません。</p>
-          <div id="hpStatus"></div>
-          <div class="list-wrap" id="hpMatrix"></div>
-          <p class="hint hidden" id="hpHint">※ …通所の条件では、土曜日（またはその日）が「通所不可」に設定されている利用者です。在宅作業として選ぶことはできます。</p>
-          <div class="actions" style="margin-top:10px">
-            <button class="primary" id="hpConfirm">確認して確定</button>
-            <button id="hpRevert">変更を取り消す</button>
-            <button class="small danger" id="hpDeleteAll">この月の在宅予定をすべて削除</button>
-          </div>
-        </section>
-        <section>
-          <h3><span class="hn-no">4</span>お知らせのプレビューを確認する</h3>
+        <section id="hnPreviewBox">
+          <h3><span class="hn-no">3</span>プレビューを確認する</h3>
           <div class="hn-preview"><canvas id="hnCanvas"></canvas></div>
-          <details id="hnEdit" style="margin-top:10px"><summary style="cursor:pointer;font-weight:bold;color:var(--blue)">文字を手入力で直す</summary>
-            <div class="field" style="margin-top:10px"><label>タイトル</label><input type="text" id="hnTitle" maxlength="60" style="width:100%;max-width:520px;font-size:17px;padding:8px;font-family:inherit"></div>
-            <div class="field"><label>日付（1行に1つ）</label><textarea id="hnText" rows="6" style="width:100%;max-width:520px;font-size:17px;padding:8px;font-family:inherit"></textarea></div>
-          </details>
-          <div id="hnManual" class="notice hidden">手入力で直した内容を表示しています（在宅作業日の設定とは連動していません）。在宅作業日を変えると、自動の内容に戻ります。
-            <div class="actions" style="margin-top:6px"><button class="small" id="hnReset">自動の内容に戻す</button></div></div>
         </section>
         <section>
-          <h3><span class="hn-no">5</span>お知らせをPNG画像として保存する</h3>
+          <h3><span class="hn-no">4</span>PNG画像として保存する</h3>
           <button class="primary big" id="hnSave">PNG画像を保存</button>
           <p class="hint" id="hnFname"></p>
-          <p class="hint">利用者ごとの在宅予定のカレンダーは「個別カレンダー」で確認・保存できます。</p>
         </section>
       </div>
     </div>
@@ -318,8 +265,7 @@ input.sel{width:22px;height:22px;vertical-align:middle;cursor:pointer}
       <div class="legend">
         <span><i style="background:var(--on)"></i>○ 通所</span>
         <span><i style="background:var(--ng)"></i>－ 本人の通所不可（曜日・日付）</span>
-        <span><i style="background:#d9d9d9"></i>事業所の休み（日曜・祝日・土曜）</span>
-        <span><i style="background:#f3e7c6"></i>在 ＝ 土曜日の在宅予定（通所人数には含めません）</span>
+        <span><i style="background:#d9d9d9"></i>事業所の休み（日曜・祝日・指定外の土曜）</span>
         <span><i style="box-shadow:inset 0 0 0 2px #e39b00"></i>手動で修正したセル</span>
         <span><i style="background-image:linear-gradient(225deg,#2f9e6a 7px,transparent 7px)"></i>備考あり（マウスを乗せると表示）</span>
         <span><i style="background:var(--near)"></i>定員まで残りわずか</span>
@@ -343,10 +289,10 @@ input.sel{width:22px;height:22px;vertical-align:middle;cursor:pointer}
       <h2 id="calTitle">通所日の設定</h2>
       <p class="hint" style="margin-top:0" id="calIntro"></p>
       <p class="hint" style="margin-top:0">
-        <b>土曜日は事業所への通所日にはなりません。</b>在宅作業をする土曜日は「在宅作業日」を選びます（対象者は「シフト表」→「土曜日在宅予定」で選んで確定します）。平日を臨時で休みにする場合は「休業日にする」にチェックします。<br>
+        <b>土曜日は「通所日にする」にチェックした日だけ</b>通所日になります（その日付が「土曜日在宅日のお知らせ」に載ります）。平日を臨時で休みにする場合は「休業日にする」にチェックします。<br>
         この設定は<b>月ごと</b>で、翌月には引き継がれません。</p>
       <div class="actions" style="margin-bottom:10px">
-        <button class="small" id="btnSatHome">土曜日をすべて在宅作業日にする</button>
+        <button class="small" id="btnSatAll">土曜日をすべて通所日にする</button>
         <button class="small" id="btnSatNone">土曜日をすべて休みにする</button>
       </div>
       <div id="calSummary" class="summary" style="margin:0 0 10px"></div>
@@ -496,7 +442,6 @@ input.sel{width:22px;height:22px;vertical-align:middle;cursor:pointer}
     <div class="field">
       <div id="dmState" style="margin-bottom:10px"></div>
       <button class="primary" id="dmToggle"></button>
-      <button class="primary hidden" id="dmHome" style="background:#b08d3c;border-color:#b08d3c"></button>
     </div>
     <div class="field">
       <label>備考（〇の横に小さく表示されます）</label>
@@ -540,7 +485,7 @@ function defaultState(){
   // cal：月ごとの通所日設定 {ym:{sat:[土曜通所日], closed:[臨時休業日]}}（シフトとは別に保存）
   // selected：画像に載せる利用者の選択状態（シフトデータとは無関係）
   // closedWeekdays：毎週の休業曜日（初期値：なし）／ dailyTarget：1日の目標人数（表示用の目安）
-  return {version:5, capacity:20, dailyTarget:9, closedWeekdays:[], users:[], months:{}, cal:{}, selected:[], currentYM:addMonth(todayYM(),1), nextId:1};
+  return {version:6, capacity:20, dailyTarget:9, closedWeekdays:[], users:[], months:{}, cal:{}, selected:[], currentYM:addMonth(todayYM(),1), nextId:1};
 }
 
 /* =========================================================
@@ -590,30 +535,13 @@ function holidaysOf(y){
 const holidayName = (ym,d)=>{ const [y,m]=ymParts(ym); return holidaysOf(y)[`${m}-${d}`] || ''; };
 
 /* 事業所としてその日が通所日かどうか */
-function calOf(ym){ return state.cal[ym] || {closed:[], home:[], homeUsers:{}}; }
-// 土曜日の扱い：'home'＝在宅作業日／'off'＝休み。土曜日は事業所への通所日にはしない
-function satMode(ym, d){ return (calOf(ym).home||[]).includes(d) ? 'home' : 'off'; }
-function setSatMode(ym, d, mode){
-  const c = ensureCal(ym);
-  const before = noticeLinesAuto(ym).join('\n');
-  c.home = c.home.filter(x=>x!==d);
-  if(mode==='home') c.home.push(d);
-  else delete c.homeUsers[d];          // 在宅作業日から外したら、その日の在宅予定も削除
-  c.home.sort((a,b)=>a-b);
-  // 在宅日が変わったら、お知らせの手入力内容は破棄して自動の内容に戻す（食い違い防止）
-  let reset = false;
-  if(c.notice && noticeLinesAuto(ym).join('\n') !== before){ delete c.notice; reset = true; }
-  save();
-  return reset;
-}
+function calOf(ym){ return state.cal[ym] || {sat:[], closed:[]}; }
 function dayInfo(ym,d){
   const w = weekday(ym,d), hol = holidayName(ym,d), c = calOf(ym);
   if(hol)   return {open:false, kind:'hol', label:hol};
   if(w===0) return {open:false, kind:'sun', label:'日曜（休み）'};
   if(w!==6 && (state.closedWeekdays||[]).includes(w)) return {open:false, kind:'wclosed', label:`${WD[w]}曜（休業日）`};
-  // 土曜日は事業所への通所日にしない（在宅作業日は「土曜日在宅予定」で別に管理）
-  if(w===6) return (c.home||[]).includes(d) ? {open:false, kind:'sathome', label:'土曜（在宅作業日）'}
-                 : {open:false, kind:'satoff', label:'土曜（休み）'};
+  if(w===6) return (c.sat||[]).includes(d) ? {open:true, kind:'satopen', label:'土曜通所日'} : {open:false, kind:'satoff', label:'土曜（休み）'};
   if((c.closed||[]).includes(d)) return {open:false, kind:'closed', label:'休業日'};
   return {open:true, kind:'wd', label:''};
 }
@@ -710,15 +638,8 @@ function load(){
       if(!v.ok) throw new Error(v.error);
       state = v.data;
       const oldVer = state.version || 1;
-      const mig = normalize();
+      normalize();
       let migrated = false;
-      if(oldVer < 5){
-        // 版5：土曜日は在宅作業日として別管理。タイトル形式が変わったため、お知らせの手入力内容は破棄
-        for(const ym in state.cal) delete state.cal[ym].notice;
-        if(mig.legacySat || mig.strippedSat)
-          startupNotices.push(`新しいルール（土曜日は事業所への通所日にしない）に合わせて、データを移行しました。\n・以前の「土曜日の通所日」の設定：${mig.legacySat}日分を解除\n・平日シフトに入っていた土曜日の通所予定：${mig.strippedSat}件を解除\n土曜日の在宅作業は「シフト表」→「土曜日在宅予定」で設定してください。\n（移行前の状態は「設定・バックアップ」の「元に戻す」で確認できます）`);
-        migrated = true;
-      }
       // 以前の版のサンプルデータ（28人）のままなら、新しいテストデータ（22人）に入れ替える
       if(oldVer < 3 && isOldSample()){ state.months = {}; loadSample(); migrated = true; }
       // 版3まで「月曜は休業日」だった設定を解除（月〜金は基本通所日）
@@ -727,9 +648,22 @@ function load(){
         if(isTestSample()) state.months = {};
         migrated = true;
       }
+      if(oldVer < 6){
+        let moved = 0;
+        for(const ym in state.cal){
+          const c = state.cal[ym], [y,mo] = ymParts(ym);
+          for(const d of (c.home||[])) if(new Date(y,mo-1,d).getDay()===6 && !holidayName(ym,d) && !c.sat.includes(d)){ c.sat.push(d); moved++; }
+          c.sat.sort((a,b)=>a-b);
+          delete c.home; delete c.notice;      // 在宅日の区分・お知らせの手入力内容は廃止（在宅予定の対象者 homeUsers は残す）
+        }
+        if(moved) startupNotices.push(`シンプルな版に戻しました。以前「在宅日（在宅作業日）」にしていた土曜日 ${moved}日分を「土曜通所日」にしました。\n「土曜日在宅日のお知らせ」には、通所日にした土曜日の日付が表示されます。\n土曜日のシフトを入れるには「自動シフト作成」をやり直してください。`);
+        migrated = true;
+      }
       if(migrated || JSON.stringify(state) !== raw){
-        // 移行の前に、念のため元の保存データを控えておく
-        if(oldVer < (defaultState().version)) writeUndo('版の更新（自動移行）', JSON.parse(raw));
+        // 移行の前に、念のため元の保存データを控えておく（前の移行の控えがあれば、そちらを残す）
+        const prevUndo = readUndo();
+        const keepPrev = prevUndo && prevUndo.action==='版の更新（自動移行）' && prevUndo.data && (prevUndo.data.version||1) < oldVer;
+        if(oldVer < (defaultState().version) && !keepPrev) writeUndo('版の更新（自動移行）', JSON.parse(raw));
         save();
       }else{ lastSavedJSON = raw; }
       return;
@@ -808,11 +742,6 @@ function validateData(input){
       if(!YM.test(ym) || !c || typeof c!=='object') return fail(`通所日の設定「${ym}」が正しくありません`);
       const okDays = a => a===undefined || (Array.isArray(a) && a.every(d=>isInt(d,1,31)));
       if(!okDays(c.sat) || !okDays(c.closed) || !okDays(c.home)) return fail(`通所日の設定「${ym}」の日付が正しくありません`);
-      if(c.homeUsers!==undefined){
-        if(!c.homeUsers || typeof c.homeUsers!=='object' || Array.isArray(c.homeUsers)) return fail(`${ym}の土曜日在宅予定の形式が違います`);
-        for(const d in c.homeUsers) if(!isInt(Number(d),1,31) || !Array.isArray(c.homeUsers[d]) || !c.homeUsers[d].every(x=>typeof x==='string')) return fail(`${ym}の土曜日在宅予定が正しくありません`);
-      }
-      if(c.notice!==undefined && !(c.notice && typeof c.notice.title==='string' && typeof c.notice.text==='string' && c.notice.title.length<=200 && c.notice.text.length<=2000)) return fail(`${ym}の在宅日のお知らせの内容が正しくありません`);
     }
   }
   if(data.capacity!==undefined && !isInt(data.capacity,1,200)) return fail('1日の定員が正しくありません');
@@ -927,27 +856,11 @@ function normalize(){
     const m = state.months[ym];
     m.assign = m.assign || {}; m.manual = m.manual || {}; m.names = m.names || {}; m.notes = m.notes || {};
   }
-  const mig = {legacySat:0, strippedSat:0};
-  const ids = new Set(state.users.map(u=>u.id));
   for(const ym in state.cal){
-    const c=state.cal[ym];
-    if(Array.isArray(c.sat)) mig.legacySat += c.sat.length;     // 以前の「土曜通所日」は廃止
-    delete c.sat;
-    c.closed=c.closed||[]; c.home=(c.home||[]).filter(d=>{ const [y,m]=ymParts(ym); return new Date(y,m-1,d).getDay()===6; });
-    const hu = {};
-    for(const d in (c.homeUsers||{})) if(c.home.includes(Number(d))){ const a=(c.homeUsers[d]||[]).filter(id=>ids.has(id)); if(a.length) hu[d]=a; }
-    c.homeUsers = hu;
-    if(c.notice && (typeof c.notice.title!=='string' || typeof c.notice.text!=='string')) delete c.notice;
-  }
-  // 土曜日は通所日ではないため、平日シフトから土曜日の割り当てを外す
-  for(const ym in state.months){
-    const m = state.months[ym], [y,mo] = ymParts(ym), isSat = d => new Date(y,mo-1,d).getDay()===6;
-    for(const id in m.assign){ const before = m.assign[id].length; m.assign[id] = m.assign[id].filter(d=>!isSat(d)); mig.strippedSat += before - m.assign[id].length; }
-    for(const id in m.manual) m.manual[id] = m.manual[id].filter(d=>!isSat(d));
+    const c=state.cal[ym]; c.sat=c.sat||[]; c.closed=c.closed||[];
   }
   state.selected = (state.selected||[]).filter(id=>state.users.some(u=>u.id===id));
-  state.version = 5;
-  return mig;
+  state.version = 6;
 }
 function isOldSample(){
   const old = '佐藤,鈴木,高橋,田中,伊藤,渡辺,山本,中村,小林,加藤,吉田,山田,佐々木,山口,松本,井上,木村,林,斎藤,清水,山崎,森,池田,橋本,阿部,石川,前田,藤田';
@@ -1000,7 +913,7 @@ function loadSample(){
   }));
   // サンプル：第1・第3土曜日を通所日にする
   const sats = []; for(let d=1; d<=daysIn(ym); d++) if(weekday(ym,d)===6) sats.push(d);
-  state.cal[ym] = {closed:[], home:[sats[1], sats[3]].filter(Boolean), homeUsers:{}};   // サンプル：第2・第4土曜日を在宅作業日（対象者は未確定）
+  state.cal[ym] = {sat:[sats[0], sats[2]].filter(Boolean), closed:[]};
   state.selected = state.users.slice(0,3).map(u=>u.id);
 }
 
@@ -1278,7 +1191,7 @@ function render(){
     document.getElementById('viewHome').classList.toggle('hidden', shiftView!=='home');
     renderShift();
     if(shiftView==='person') renderPerson();
-    if(shiftView==='home') renderHomePlan();
+    if(shiftView==='home') renderHomeNotice();
   }
   if(currentTab==='cal') renderCal();
   if(currentTab==='users') renderUsers();
@@ -1290,17 +1203,18 @@ function renderShift(){
   const A = analyze(ym);
   const activeN = state.users.filter(u=>u.active).length;
 
+  const satOpen = A.open.filter(d=>weekday(ym,d)===6).length;
   document.getElementById('summary').innerHTML =
-    `<div>暦日数 <b>${D}</b> 日</div><div>事業所の通所日 <b>${A.open.length}</b> 日（平日）</div><div>土曜の在宅作業日 <b>${homeDays(ym).length}</b> 日</div>` +
+    `<div>暦日数 <b>${D}</b> 日</div><div>事業所の通所日 <b>${A.open.length}</b> 日（うち土曜 ${satOpen}日）</div>` +
     (A.T ? `<div>1日の目標（目安） <b>${A.T}</b> 人</div>` : '') +
     `<div>1日の定員 <b>${cap}</b> 人</div><div>対象の利用者 <b>${activeN}</b> 人</div>` +
     `<div>延べ通所予定 <b>${A.cnt.reduce((a,b)=>a+b,0)}</b> 人日 ／ 月の総定員 <b>${A.totalCap}</b> 人日</div>`;
 
   const manualCount = m ? Object.values(m.manual).reduce((s,a)=>s+a.length,0) : 0;
   let notice = '';
-  const unsetHome = homeDays(ym).filter(d=>!homeUsersOf(ym,d).length);
-  if(unsetHome.length)
-    notice += `<div class="notice">土曜の在宅作業日（${unsetHome.map(d=>d+'日').join('・')}）の対象者がまだ確定していません。「<b>土曜日在宅予定</b>」で選んで確定してください。</div>`;
+  const sats = []; for(let d=1; d<=D; d++) if(weekday(ym,d)===6) sats.push(d);
+  if(sats.length && !calOf(ym).sat.length)
+    notice += `<div class="notice">⚠ ${ymLabel(ym)}は、土曜日の通所日がまだ指定されていません（土曜日はすべて休みとして扱います）。「<b>通所日の設定</b>」で指定できます。</div>`;
   if(false)
     notice += `<div class="notice">基本の通所目標（${baseTarget(ym)}日）が、この月の事業所の通所日（${A.open.length}日）より多いため、目標日数が空欄の利用者は最大でも${A.open.length}日になります。</div>`;
   if(!m) notice += `<div class="notice">${ymLabel(ym)}のシフトはまだ作成されていません。「<b>自動シフト作成</b>」を押してください。</div>`;
@@ -1311,7 +1225,7 @@ function renderShift(){
   document.getElementById('monthNotice').innerHTML = notice;
 
   const info = []; for(let d=1; d<=D; d++) info[d] = dayInfo(ym,d);
-  const cls = d => { const w=weekday(ym,d); return (w===0?'sun':w===6?'sat':'') + (info[d].open?'':' closed') + (info[d].kind==='hol'?' hol':'') + (info[d].kind==='sathome'?' home':''); };
+  const cls = d => { const w=weekday(ym,d); return (w===0?'sun':w===6?'sat':'') + (info[d].open?'':' closed') + (info[d].kind==='hol'?' hol':''); };
   let h = '<thead><tr><th class="name" rowspan="2">名字</th>';
   for(let d=1; d<=D; d++) h += `<th class="${cls(d)}" title="${esc(info[d].label)}">${d}</th>`;
   h += '<th rowspan="2">予定</th><th rowspan="2">目標</th><th rowspan="2">差</th></tr><tr>';
@@ -1325,8 +1239,7 @@ function renderShift(){
       const on = r.days.has(d), closed = !info[d].open, ng = !closed && r.user && isNG(r.user,ym,d);
       const c = ['c', cls(d), on?'on':'', ng&&!on?'ng':'', man.has(d)?'manual':''].join(' ');
       const nt = noteOf(ym, r.id, d);
-      const hp = weekday(ym,d)===6 && isHomePlanned(ym, r.id, d);   // 土曜日の在宅予定（通所とは別）
-      h += `<td class="${c}${nt?' hasnote':''}${hp?' homeplan':''}" data-u="${r.id}" data-d="${d}"${nt||hp?` title="${hp?'土曜日在宅予定':''}${nt?'　備考：'+esc(nt):''}"`:''}>${on?'○':hp?'在':(ng?'－':'')}</td>`;
+      h += `<td class="${c}${nt?' hasnote':''}" data-u="${r.id}" data-d="${d}"${nt?` title="備考：${esc(nt)}"`:''}>${on?'○':(ng?'－':'')}</td>`;
     }
     const diff = r.diff===null ? '－' : (r.diff>0?'+'+r.diff:r.diff);
     h += `<td class="sum">${r.assigned}</td><td class="sum" title="${r.flex?'毎日通所可能（通える日すべて）':''}">${r.target===null?'－':r.target}</td><td class="sum ${r.diff<0?'minus':''}">${diff}</td></tr>`;
@@ -1429,7 +1342,7 @@ function renderCal(){
   document.getElementById('calTitle').textContent = `${ymLabel(ym)}の通所日の設定`;
   const cw = (state.closedWeekdays||[]).filter(w=>w>=1&&w<=5).map(w=>WD[w]);
   const ow = [1,2,3,4,5].filter(w=>!(state.closedWeekdays||[]).includes(w)).map(w=>WD[w]);
-  document.getElementById('calIntro').textContent = `${ow.join('・')}曜は通所日、日曜・祝日${cw.length?'・'+cw.join('・')+'曜（休業日）':''}は休みです（祝日は自動で判定します）。土曜日は事業所への通所日にはなりません。`;
+  document.getElementById('calIntro').textContent = `${ow.join('・')}曜は通所日、日曜・祝日${cw.length?'・'+cw.join('・')+'曜（休業日）':''}は休みです（祝日は自動で判定します）。`;
   const offset = (weekday(ym,1)+6)%7;           // 月曜はじまり
   const head = ['月','火','水','木','金','土','日'];
   let h = '<tr>' + head.map((w,i)=>`<th class="${i===5?'sat':i===6?'sun':''}">${w}</th>`).join('') + '</tr><tr>';
@@ -1438,7 +1351,7 @@ function renderCal(){
     const info = dayInfo(ym,d), w = weekday(ym,d);
     let body = `<div class="dn">${d}</div><div class="lb">${esc(info.label || '通所日')}</div>`;
     if(info.kind==='hol' || info.kind==='wclosed'){ /* 祝日・休業曜日は休み固定 */ }
-    else if(w===6) body += `<select class="satsel" data-satmode="${d}">${[['off','休み'],['home','在宅作業日']].map(([v,t])=>`<option value="${v}" ${satMode(ym,d)===v?'selected':''}>${t}</option>`).join('')}</select>`;
+    else if(w===6) body += `<label class="ck"><input type="checkbox" data-sat="${d}" ${info.open?'checked':''}>通所日にする</label>`;
     else if(w!==0) body += `<label class="ck"><input type="checkbox" data-closed="${d}" ${info.kind==='closed'?'checked':''}>休業日にする</label>`;
     h += `<td class="k-${info.kind}">${body}</td>`;
     if((offset+d)%7===0 && d<D) h += '</tr><tr>';
@@ -1451,7 +1364,7 @@ function renderCal(){
   const open = openDays(ym);
   const hols = []; for(let d=1; d<=D; d++){ const n=holidayName(ym,d); if(n) hols.push(`${d}日（${WD[weekday(ym,d)]}）${n}`); }
   document.getElementById('calSummary').innerHTML =
-    `<div>通所日（平日） <b>${open.length}</b> 日</div><div>土曜の在宅作業日 <b>${homeDays(ym).length}</b> 日</div>` +
+    `<div>通所日 <b>${open.length}</b> 日</div><div>うち土曜 <b>${open.filter(d=>weekday(ym,d)===6).length}</b> 日</div>` +
     `<div>1か月の総定員 <b>${open.length*state.capacity}</b> 人日</div>` +
     `<div>祝日：${hols.length?esc(hols.join('、')):'なし'}</div>`;
   const m = state.months[ym];
@@ -1459,7 +1372,7 @@ function renderCal(){
     ? '<div class="notice">この月はシフト作成済みです。通所日を変更したら、「シフト表」で<b>自動シフト作成</b>をやり直してください。</div>' : '';
 }
 function setCal(ym, field, d, on){
-  const c = ensureCal(ym);
+  const c = state.cal[ym] || (state.cal[ym] = {sat:[], closed:[]});
   const s = new Set(c[field]); on ? s.add(d) : s.delete(d);
   c[field] = [...s].sort((a,b)=>a-b);
   save(); renderCal();
@@ -1532,7 +1445,7 @@ function toggleCell(uid, d){
     const info = dayInfo(ym,d);
     if(!info.open){
       alert(`${d}日（${WD[weekday(ym,d)]}）は事業所の休み（${info.label}）のため、通所にできません。` +
-            (weekday(ym,d)===6 ? '\n土曜日の在宅作業は「シフト表」→「土曜日在宅予定」で登録してください。' : ''));
+            (weekday(ym,d)===6 ? '\n土曜日を通所日にするには「通所日の設定」でチェックを入れてください。' : ''));
       return;
     }
     const A = analyze(ym);
@@ -1624,10 +1537,8 @@ function deleteUser(id){
     m.names[id] = u.name;
     if(ym >= now){ delete m.assign[id]; delete m.manual[id]; }
   }
-  for(const ym in state.cal){ if(ym < now) continue; const c = state.cal[ym]; for(const d in (c.homeUsers||{})){ c.homeUsers[d] = c.homeUsers[d].filter(x=>x!==id); if(!c.homeUsers[d].length) delete c.homeUsers[d]; } }
   state.users = state.users.filter(x=>x.id!==id);
   state.selected = state.selected.filter(x=>x!==id);
-  hpDraft = null;
   save(); render();
 }
 
@@ -1832,7 +1743,6 @@ function buildCalendarCanvases(ym, mode){
         if(inf.kind==='hol'){ lab = inf.label; labColor = '#c0392b'; }
         else if(inf.kind==='satopen'){ lab = '土曜通所日'; labColor = '#2456a6'; }
         else if(inf.kind==='closed'){ lab = '休業日'; }
-        else if(inf.kind==='sathome'){ lab = '在宅日'; labColor = '#8a6a1f'; }
         if(lab) text(lab, x+10, yy+50, {size:15, bold:true, color:labColor});
         if(inf.open){
           // 人数（全体は定員と比較、選択は対象者の人数＋全体人数）
@@ -1850,7 +1760,7 @@ function buildCalendarCanvases(ym, mode){
             text(n, x + 10 + col*nameW, yy + headH + row*lineH + lineH/2, {size:fs, bold:true, color:'#1d1d1d'});
           });
         }else{
-          text(inf.kind==='sathome'?'在宅':'休み', x+cellW/2, yy+headH + (rh-headH)/2 - 4, {size:26, bold:true, align:'center', color: inf.kind==='sathome'?'#a88433':red?'#d77':'#999'});
+          text('休み', x+cellW/2, yy+headH + (rh-headH)/2 - 4, {size:26, bold:true, align:'center', color: red?'#d77':'#999'});
         }
       });
       line(pad, yy, pad+cellW*7, yy, '#8a9bb0', 1.5);
@@ -1865,7 +1775,7 @@ function buildCalendarCanvases(ym, mode){
     const ok = !overDays.length && !closedAssigned.length;
     const chk = ok ? `✔ すべての日で通所人数は定員${cap}人以内です` : `⚠ 定員超過または休みの日への割り当てがあります（${[...overDays,...closedAssigned].join('・')}日）`;
     text(chk, pad, yy+24, {size:18, bold:true, color: ok?'#1e7d3a':'#c0392b'});
-    text('日曜・祝日は休業日／土曜日は在宅作業日（事業所への通所はありません）', pad, yy+52, {size:16, color:'#555'});
+    text('日曜・祝日は休み／土曜は青い「土曜通所日」の日のみ通所', pad, yy+52, {size:16, color:'#555'});
     return cv;
   });
 }
@@ -1926,17 +1836,7 @@ function drawPersonCalendar(cv, ym, uid){
     text(label, x+cw-10, yy+16, {size:17, align:'right', color});
     const note = inMonth ? noteOf(ym, uid, d) : '';
     const on = inMonth && days.has(d) && isOpen(ym,d);
-    const home = inMonth && col===5 && isHomePlanned(ym, uid, d);          // 土曜日の在宅予定
-    const closedDay = inMonth && (col===6 || holidayName(ym,d));            // 日曜・祝日は休業日
     const cy = yy + PC.cellH/2 + 12;
-    if(home){
-      // 「在宅」（通所の〇とは別の表示）
-      const bw = 64, bh = 34, bx = note ? x + 8 : x + cw/2 - bw/2, by = cy - bh/2;
-      g.fillStyle = '#fff'; g.strokeStyle = '#111'; g.lineWidth = 2;
-      g.beginPath(); if(g.roundRect) g.roundRect(bx, by, bw, bh, 8); else g.rect(bx, by, bw, bh); g.fill(); g.stroke();
-      text('在宅', bx + bw/2, cy + 1, {size:21, bold:true, align:'center', color:'#111'});
-    }
-    if(closedDay && !on && !home) text('休業日', x + cw/2, cy, {size:15, align:'center', color: col===6 ? '#5b2a05' : '#d0302a'});
     if(on){
       // 備考があるときは〇を左に寄せ、右側に小さく備考を書く
       const cx = note ? x + 34 : x + cw/2;
@@ -1944,7 +1844,7 @@ function drawPersonCalendar(cv, ym, uid){
       g.beginPath(); g.ellipse(cx, cy, 23, 21, 0, 0, Math.PI*2); g.stroke();
     }
     if(note){
-      const left = home ? x + 78 : on ? x + 64 : x + 10, maxW = x + cw - 6 - left;
+      const left = on ? x + 64 : x + 10, maxW = x + cw - 6 - left;
       const lines = wrapText(g, note, maxW, `bold 14px ${F}`, 3);
       const lh = 17, startY = cy - (lines.length-1)*lh/2;
       lines.forEach((ln,k)=>text(ln, left, startY + k*lh, {size:14, bold:true, color: col>=5 ? '#1a1a1a' : '#3a4a5a'}));
@@ -2011,8 +1911,7 @@ function renderPerson(){
   drawPersonCalendar(cv, state.currentYM, pcUserId);
   const u = findUser(pcUserId), ym = state.currentYM;
   const n = (state.months[ym]?.assign[pcUserId]||[]).length;
-  const hn = homeDays(ym).filter(d=>homeUsersOf(ym,d).includes(pcUserId)).length;
-  document.getElementById('pcInfo').textContent = u ? `　${u.name}さん：${ymLabel(ym)}は 通所 ${n}日（${isFlex(u)?'毎日通所可能':'月'+u.desired+'日'}）／土曜在宅 ${hn}日` : '';
+  document.getElementById('pcInfo').textContent = u ? `　${u.name}さん：${ymLabel(ym)}は ${n}日 通所予定（${isFlex(u)?'毎日通所可能':'月'+u.desired+'日'}）` : '';
 }
 function savePersonPNG(uid){
   const ym = state.currentYM, [y,mo] = ymParts(ym);
@@ -2035,20 +1934,14 @@ async function exportPersonPNGs(ids){
 
 /* =========================================================
    土曜日在宅日のお知らせ（A4横・PNG）
-   日付は「通所日の設定」の在宅日（state.cal[ym].home）から自動で作る
+   日付は「通所日の設定」で通所日にした土曜日（state.cal[ym].sat）から自動で作る
    ========================================================= */
 const HN = {W:1754, H:1240, S:2};   // A4横（297×210mm）。保存は 3508×2480px（300dpi相当）
 const HN_GOLD = '#b08d3c', HN_GOLD_L = '#d9c38c', HN_TEXT = '#2b2b2b';
 const HN_FONT = '"Yu Gothic","YuGothic","Hiragino Kaku Gothic ProN","Meiryo","Noto Sans JP",sans-serif';
 const noticeTitleAuto = ym => { const [y,mo] = ymParts(ym); return `${y}年${mo}月 土曜日在宅日のお知らせ`; };
-const homeDays = ym => (calOf(ym).home||[]).filter(d=>weekday(ym,d)===6 && !holidayName(ym,d)).sort((a,b)=>a-b);
-const noticeLinesAuto = ym => homeDays(ym).map(d=>`${d}日（土）`);
-// お知らせの内容（手入力で直していれば、その内容）
-function noticeContent(ym){
-  const ov = calOf(ym).notice;
-  if(ov) return {title: ov.title, lines: String(ov.text||'').split('\n').map(s=>s.trim()).filter(Boolean), manual:true};
-  return {title: noticeTitleAuto(ym), lines: noticeLinesAuto(ym), manual:false};
-}
+const homeDays = ym => (calOf(ym).sat||[]).filter(d=>weekday(ym,d)===6 && !holidayName(ym,d)).sort((a,b)=>a-b);   // 通所日にした土曜日
+function noticeContent(ym){ return {title: noticeTitleAuto(ym), lines: homeDays(ym).map(d=>`${d}日（土）`)}; }
 function drawHomeNotice(cv, ym){
   const {W,H,S} = HN, {title, lines} = noticeContent(ym);
   cv.width = W*S; cv.height = H*S;
@@ -2104,145 +1997,22 @@ function drawHomeNotice(cv, ym){
     }
   });
 }
-/* =========================================================
-   土曜日在宅予定（平日の通所シフトとは別に管理）
-   ・在宅作業日（日付）   … state.cal[ym].home      = [日, …]
-   ・在宅予定（確定済み） … state.cal[ym].homeUsers = {日: [利用者ID, …]}
-   ・画面で選んでいる途中の内容は hpDraft（未確定）に置き、「確認して確定」で保存する
-   ========================================================= */
-function ensureCal(ym){ const c = state.cal[ym] || (state.cal[ym] = {closed:[], home:[], homeUsers:{}}); c.home = c.home||[]; c.homeUsers = c.homeUsers||{}; c.closed = c.closed||[]; return c; }
-function homeUsersOf(ym, d){ const c = calOf(ym); return (c.homeUsers && c.homeUsers[d]) || []; }
-function isHomePlanned(ym, uid, d){ return homeDays(ym).includes(d) && homeUsersOf(ym,d).includes(uid); }
-function setHomeUsers(ym, d, ids){
-  const c = ensureCal(ym), s = new Set(ids);
-  const arr = state.users.map(u=>u.id).filter(id=>s.has(id));     // 並びは利用者一覧の順
-  if(arr.length) c.homeUsers[d] = arr; else delete c.homeUsers[d];
-}
-let hpDraft = null;   // {ym, plans:{日:[ID]}, dirty}
-function hpLoad(ym){ const plans = {}; for(const d of homeDays(ym)) plans[d] = [...homeUsersOf(ym,d)]; hpDraft = {ym, plans, dirty:false}; }
-function hpEnsure(){
-  const ym = state.currentYM;
-  if(!hpDraft || hpDraft.ym !== ym || !hpDraft.dirty){ hpLoad(ym); return; }
-  const days = homeDays(ym);
-  for(const d of days) if(!hpDraft.plans[d]) hpDraft.plans[d] = [];
-  for(const d in hpDraft.plans) if(!days.includes(Number(d))) delete hpDraft.plans[d];
-}
-function hpIsDirty(){
-  if(!hpDraft || hpDraft.ym !== state.currentYM) return false;
-  return homeDays(hpDraft.ym).some(d => JSON.stringify([...(hpDraft.plans[d]||[])].sort()) !== JSON.stringify([...homeUsersOf(hpDraft.ym,d)].sort()));
-}
-// 未確定の変更がある状態で月や画面を切り替えるときの確認
-function leaveHomeDraftOK(){
-  if(!hpDraft || !hpDraft.dirty || !hpIsDirty()) return true;
-  if(!confirm(`${ymLabel(hpDraft.ym)}の土曜日在宅予定に、まだ確定していない変更があります。\n\n［OK］＝変更を破棄して移動する\n［キャンセル］＝この画面に戻る`)) return false;
-  hpDraft = null; return true;
-}
-function goMonth(ym){
-  if(!leaveHomeDraftOK()){ render(); return; }
-  state.currentYM = ym; save(); render();
-}
-const hpUsers = ym => state.users.filter(u => u.active || homeDays(ym).some(d=>homeUsersOf(ym,d).includes(u.id)));
-
-function renderHomePlan(){
-  hpEnsure();
-  const ym = state.currentYM, D = daysIn(ym), f = id => document.getElementById(id);
+function renderHomeNotice(){
+  const ym = state.currentYM, f = id => document.getElementById(id), days = homeDays(ym);
   f('hnYm').value = ym;
-  const days = homeDays(ym), [, mo] = ymParts(ym);
-  // ② カレンダー（土曜日の枠を押すと在宅作業日になる）
-  const offset = (weekday(ym,1)+6)%7;
-  let h = '<tr>' + ['月','火','水','木','金','土','日'].map((w,i)=>`<th class="${i===5?'sat':i===6?'sun':''}">${w}</th>`).join('') + '</tr><tr>';
-  for(let i=0;i<offset;i++) h += '<td class="out"></td>';
-  for(let d=1; d<=D; d++){
-    const w = weekday(ym,d), hol = holidayName(ym,d);
-    let cls = '', body = `<div class="dn">${d}</div>`;
-    if(w===6 && !hol){
-      const on = days.includes(d), n = homeUsersOf(ym,d).length;
-      cls = on ? 'hp-sat on' : 'hp-sat';
-      body += on ? `<div class="lb">在宅作業日</div><div class="lb2">${n?`${n}人 確定`:'対象者 未確定'}</div>` : `<div class="lb">休み<br><span class="hint">押すと在宅作業日</span></div>`;
-      h += `<td class="${cls}" data-hpday="${d}" title="押すと切り替わります">${body}</td>`;
-    }else{
-      const lab = hol ? hol : w===0 ? '休業日' : w===6 ? '休み' : '';
-      cls = hol||w===0 ? 'hp-off' : w===6 ? 'hp-off' : '';
-      h += `<td class="${cls}">${body}<div class="lb">${esc(lab)}</div></td>`;
-    }
-    if((offset+d)%7===0 && d<D) h += '</tr><tr>';
-  }
-  const tail = (7 - (offset+D)%7) % 7; for(let i=0;i<tail;i++) h += '<td class="out"></td>';
-  f('hpCal').innerHTML = h + '</tr>';
-  f('hnCount').textContent = `在宅作業日：${days.length}日`;
-
-  // ③ 対象者の選択（日付ごとにチェック）
-  const users = hpUsers(ym);
-  if(!days.length){
-    f('hpMatrix').innerHTML = '<p class="hint">②で在宅作業日を選ぶと、ここで対象者を選べます。</p>';
-  }else{
-    let t = '<table class="list hp-mx"><tr><th>名字</th>' + days.map(d=>`<th class="hp-col"><div>${mo}月${d}日（土）</div>
-      <div class="hp-colbtn"><button class="small" data-hpall="${d}">全員選択</button><button class="small" data-hpnone="${d}">全員解除</button></div>
-      <button class="small danger" data-hpdel="${d}">この日の予定を削除</button></th>`).join('') + '</tr>';
-    for(const u of users){
-      t += `<tr><td><b>${esc(u.name)}</b>${u.active?'':'<span class="hint">（無効）</span>'}</td>`;
-      for(const d of days){
-        const ch = (hpDraft.plans[d]||[]).includes(u.id);
-        const warn = isNG(u, ym, d);
-        t += `<td class="hp-cell ${ch?'on':''}"><label><input type="checkbox" data-hpd="${d}" data-hpu="${u.id}" ${ch?'checked':''}> 在宅${warn?'<span class="hp-warn" title="通所の条件では土曜日・この日は不可に設定されています">※</span>':''}</label></td>`;
-      }
-      t += '</tr>';
-    }
-    t += '<tr class="hp-sum"><td>人数</td>' + days.map(d=>`<td>${(hpDraft.plans[d]||[]).length}人</td>`).join('') + '</tr></table>';
-    f('hpMatrix').innerHTML = t;
-  }
-  const dirty = hpIsDirty(); hpDraft.dirty = dirty;
-  f('hpConfirm').disabled = !dirty; f('hpRevert').disabled = !dirty;
-  const unset = days.filter(d=>!homeUsersOf(ym,d).length);
-  f('hpStatus').innerHTML = !days.length ? '' :
-    dirty ? '<div class="hp-st warn">● まだ確定していない変更があります。「確認して確定」を押すと保存されます。</div>'
-    : unset.length ? `<div class="hp-st warn">● ${unset.map(d=>d+'日').join('・')}の対象者がまだ確定していません。</div>`
-    : '<div class="hp-st ok">✔ この月の在宅予定はすべて確定済みです。</div>';
-  f('hpHint').classList.toggle('hidden', !users.some(u=>days.some(d=>isNG(u,ym,d))));
-
-  // ④ お知らせ
-  const c = noticeContent(ym);
-  if(document.activeElement !== f('hnTitle')) f('hnTitle').value = c.title;
-  if(document.activeElement !== f('hnText'))  f('hnText').value  = c.lines.join('\n');
-  f('hnManual').classList.toggle('hidden', !c.manual);
-  drawHomeNotice(f('hnCanvas'), ym);
-  const [y] = ymParts(ym);
+  f('hnDays').innerHTML = days.length
+    ? `<b style="font-size:18px">${days.map(d=>d+'日（土）').join('　')}</b>`
+    : '<span class="result-ng">この月は、通所日に設定されている土曜日がありません。</span>';
+  f('hnEmpty').classList.toggle('hidden', !!days.length);
+  f('hnPreviewBox').classList.toggle('hidden', !days.length);
+  f('hnSave').disabled = !days.length;
+  if(days.length) drawHomeNotice(f('hnCanvas'), ym);
+  const [y,mo] = ymParts(ym);
   f('hnFname').textContent = `保存するファイル名：${y}年${mo}月_土曜日在宅日のお知らせ.png`;
-}
-// 在宅作業日の切り替え（外すときは、その日の在宅予定も削除）
-function toggleHomeDay(d){
-  const ym = state.currentYM, on = homeDays(ym).includes(d);
-  if(on){
-    const n = Math.max(homeUsersOf(ym,d).length, (hpDraft && hpDraft.ym===ym && hpDraft.plans[d] || []).length);
-    if(n && !confirm(`${d}日（土）を在宅作業日から外すと、この日の在宅予定（${n}人）も削除されます。よろしいですか？`)) return;
-  }
-  const reset = setSatMode(ym, d, on ? 'off' : 'home');
-  if(hpDraft && hpDraft.ym===ym){ if(on) delete hpDraft.plans[d]; else hpDraft.plans[d] = []; }
-  if(reset) toast('在宅日が変わったため、お知らせを自動の内容に戻しました');
-  render();
-}
-function hpConfirm(){
-  const ym = state.currentYM, [, mo] = ymParts(ym), days = homeDays(ym);
-  const name = id => (findUser(id)||{}).name || '?';
-  const lines = days.map(d=>{
-    const ids = hpDraft.plans[d]||[];
-    return `■ ${mo}月${d}日（土）　${ids.length}人\n　${ids.length ? ids.map(id=>name(id)+'さん').join('、') : '（対象者なし）'}`;
-  });
-  if(!confirm(`${ymLabel(ym)}の土曜日在宅予定を、次の内容で確定します。\n\n${lines.join('\n\n')}\n\nよろしいですか？`)) return;
-  for(const d of days) setHomeUsers(ym, d, hpDraft.plans[d]||[]);
-  save(); hpDraft = null; render(); toast('土曜日の在宅予定を確定しました');
-}
-
-function setNoticeOverride(ym, title, text){
-  const c = ensureCal(ym);
-  const autoT = noticeTitleAuto(ym), autoX = noticeLinesAuto(ym).join('\n');
-  const norm = s => String(s).split('\n').map(x=>x.trim()).filter(Boolean).join('\n');
-  if(title.trim()===autoT && norm(text)===autoX) delete c.notice;          // 自動と同じなら手入力扱いにしない
-  else c.notice = {title: title.trim() || autoT, text: norm(text)};
-  save();
 }
 function saveHomeNoticePNG(){
   const ym = state.currentYM, [y,mo] = ymParts(ym);
+  if(!homeDays(ym).length){ alert('この月は、通所日に設定されている土曜日がありません。\n「通所日の設定」で土曜日を通所日にすると作成できます。'); return; }
   const cv = document.createElement('canvas'); drawHomeNotice(cv, ym);
   const fname = `${y}年${mo}月_土曜日在宅日のお知らせ.png`;
   saveCanvas(cv, fname).then(()=>toast(`「${fname}」を保存しました（ダウンロードフォルダ）`));
@@ -2366,17 +2136,17 @@ function renderPngModal(){
 /* =========================================================
    イベント
    ========================================================= */
-document.querySelectorAll('nav.tabs button').forEach(b=>b.onclick=()=>{ if(!leaveHomeDraftOK()) return; currentTab=b.dataset.tab; render(); });
-document.getElementById('prevM').onclick = ()=>goMonth(addMonth(state.currentYM,-1));
-document.getElementById('nextM').onclick = ()=>goMonth(addMonth(state.currentYM,1));
-document.getElementById('ymPick').onchange = e=>{ if(e.target.value) goMonth(e.target.value); };
+document.querySelectorAll('nav.tabs button').forEach(b=>b.onclick=()=>{ currentTab=b.dataset.tab; render(); });
+document.getElementById('prevM').onclick = ()=>{ state.currentYM = addMonth(state.currentYM,-1); save(); render(); };
+document.getElementById('nextM').onclick = ()=>{ state.currentYM = addMonth(state.currentYM,1); save(); render(); };
+document.getElementById('ymPick').onchange = e=>{ if(e.target.value){ state.currentYM = e.target.value; save(); render(); } };
 document.getElementById('btnAuto').onclick = autoCreate;
 document.getElementById('btnPng').onclick = ()=>openPngModal();
 document.getElementById('btnUsers2').onclick = ()=>{ currentTab='users'; render(); };
 document.getElementById('btnCal2').onclick = ()=>{ currentTab='cal'; render(); };
 
 // 全体シフト／個別カレンダー
-document.querySelectorAll('.viewtabs button').forEach(b=>b.onclick=()=>{ if(b.dataset.view!=='home' && !leaveHomeDraftOK()) return; shiftView=b.dataset.view; render(); });
+document.querySelectorAll('.viewtabs button').forEach(b=>b.onclick=()=>{ shiftView=b.dataset.view; render(); });
 document.getElementById('pcUser').onchange = e=>{ pcUserId = e.target.value; renderPerson(); };
 const pcStep = k=>{ const l=pcCandidates(); if(!l.length) return; const i=l.findIndex(u=>u.id===pcUserId); pcUserId=l[(i+k+l.length)%l.length].id; renderPerson(); };
 document.getElementById('pcPrev').onclick = ()=>pcStep(-1);
@@ -2407,37 +2177,15 @@ function renderDayModal(){
   const [, mo] = ymParts(ym), info = dayInfo(ym,d);
   const on = (state.months[ym]?.assign[uid]||[]).includes(d);
   document.getElementById('dmTitle').textContent = `${mo}月${d}日（${WD[weekday(ym,d)]}）　${u?u.name:''}さん`;
-  const isSat = weekday(ym,d)===6 && !holidayName(ym,d), homeDay = isSat && homeDays(ym).includes(d), hp = homeDay && homeUsersOf(ym,d).includes(uid);
-  document.getElementById('dmState').innerHTML = isSat
-    ? (homeDay ? `土曜日の在宅作業日です。現在：<b style="font-size:20px;color:${hp?'#8a6a1f':'#777'}">${hp?'在宅予定あり':'在宅予定なし'}</b><div class="hint">平日の通所シフトとは別に管理されます。</div>`
-               : '<span class="hint">この土曜日は在宅作業日ではありません（「土曜日在宅予定」で在宅作業日にできます）。備考だけ入れられます。</span>')
-    : !info.open
+  document.getElementById('dmState').innerHTML = !info.open
     ? `<span class="hint">この日は事業所の休み（${esc(info.label)}）です。備考だけ入れられます。</span>`
     : `現在：<b style="font-size:20px;color:${on?'var(--blue)':'#777'}">${on?'〇 通所':'休み'}</b>`;
   const tb = document.getElementById('dmToggle');
   tb.classList.toggle('hidden', !info.open);
   tb.textContent = on ? '休みにする' : '通所にする（〇）';
-  const hb = document.getElementById('dmHome');
-  hb.classList.toggle('hidden', !homeDay);
-  hb.textContent = hp ? '在宅予定から外す' : '在宅予定にする';
 }
 function closeDayModal(){ document.getElementById('dayModal').classList.remove('show'); dayEdit = null; }
 document.getElementById('dmToggle').onclick = ()=>{ if(!dayEdit) return; toggleCell(dayEdit.uid, dayEdit.d); renderDayModal(); };
-// 利用者ごとの土曜日在宅予定の登録・変更（すぐに確定して保存）
-document.getElementById('dmHome').onclick = ()=>{
-  if(!dayEdit) return;
-  const ym = state.currentYM, {uid, d} = dayEdit, cur = homeUsersOf(ym,d);
-  const next = cur.includes(uid) ? cur.filter(x=>x!==uid) : [...cur, uid];
-  setHomeUsers(ym, d, next); save();
-  // 在宅予定の画面で選んでいる途中の内容にも、同じ変更を反映する
-  if(hpDraft && hpDraft.ym===ym){
-    const set = new Set(hpDraft.plans[d]||[]);
-    next.includes(uid) ? set.add(uid) : set.delete(uid);
-    hpDraft.plans[d] = [...set];
-  }
-  renderDayModal(); renderShift(); renderPerson();
-  toast(next.includes(uid) ? '在宅予定に登録しました' : '在宅予定から外しました');
-};
 document.getElementById('dmSave').onclick = ()=>{
   if(!dayEdit) return;
   setNote(state.currentYM, dayEdit.uid, dayEdit.d, document.getElementById('dmNote').value);
@@ -2454,61 +2202,27 @@ document.getElementById('dmNote').onkeydown = e=>{ if(e.key==='Enter') document.
 
 // 土曜日在宅日のお知らせ
 document.getElementById('btnHome2').onclick = ()=>{ shiftView='home'; render(); };
-window.addEventListener('beforeunload', e=>{ if(hpDraft && hpDraft.dirty && hpIsDirty()){ e.preventDefault(); e.returnValue=''; } });
-document.getElementById('hnPrev').onclick = ()=>goMonth(addMonth(state.currentYM,-1));
-document.getElementById('hnNext').onclick = ()=>goMonth(addMonth(state.currentYM,1));
-document.getElementById('hnYm').onchange = e=>{ if(e.target.value) goMonth(e.target.value); };
-document.getElementById('hpCal').onclick = e=>{ const td = e.target.closest('td[data-hpday]'); if(td) toggleHomeDay(Number(td.dataset.hpday)); };
-document.getElementById('hpMatrix').onchange = e=>{
-  const t = e.target; if(!t.dataset.hpd) return;
-  const d = t.dataset.hpd, set = new Set(hpDraft.plans[d]||[]);
-  t.checked ? set.add(t.dataset.hpu) : set.delete(t.dataset.hpu);
-  hpDraft.plans[d] = [...set]; hpDraft.dirty = true; renderHomePlan();
-};
-document.getElementById('hpMatrix').onclick = e=>{
-  const b = e.target.closest('button'); if(!b) return;
-  const ym = state.currentYM;
-  if(b.dataset.hpall){ hpDraft.plans[b.dataset.hpall] = hpUsers(ym).filter(u=>u.active).map(u=>u.id); hpDraft.dirty = true; renderHomePlan(); }
-  if(b.dataset.hpnone){ hpDraft.plans[b.dataset.hpnone] = []; hpDraft.dirty = true; renderHomePlan(); }
-  if(b.dataset.hpdel){
-    const d = Number(b.dataset.hpdel), n = homeUsersOf(ym,d).length;
-    if(!confirm(`${d}日（土）の在宅予定（確定済み ${n}人）を削除しますか？\n（在宅作業日の設定は残ります。日付ごと外すときは②のカレンダーで切り替えてください）`)) return;
-    setHomeUsers(ym, d, []); save(); hpDraft.plans[d] = []; render(); toast(`${d}日の在宅予定を削除しました`);
-  }
-};
-document.getElementById('hpConfirm').onclick = hpConfirm;
-document.getElementById('hpRevert').onclick = ()=>{ if(confirm('まだ確定していない変更を取り消して、確定済みの内容に戻しますか？')){ hpDraft = null; render(); } };
-document.getElementById('hpDeleteAll').onclick = ()=>{
-  const ym = state.currentYM, n = homeDays(ym).reduce((t,d)=>t+homeUsersOf(ym,d).length,0);
-  if(!confirm(`${ymLabel(ym)}の土曜日在宅予定（確定済み 延べ${n}人）をすべて削除しますか？\n（在宅作業日の設定は残ります）`)) return;
-  for(const d of homeDays(ym)) setHomeUsers(ym, d, []);
-  save(); hpDraft = null; render(); toast('この月の在宅予定を削除しました');
-};
-const hnInput = ()=>{ setNoticeOverride(state.currentYM, document.getElementById('hnTitle').value, document.getElementById('hnText').value); renderHomePlan(); };
-document.getElementById('hnTitle').oninput = hnInput;
-document.getElementById('hnText').oninput = hnInput;
-document.getElementById('hnReset').onclick = ()=>{ const c = state.cal[state.currentYM]; if(c){ delete c.notice; save(); } document.getElementById('hnTitle').blur(); document.getElementById('hnText').blur(); renderHomePlan(); toast('自動の内容に戻しました'); };
+document.getElementById('hnPrev').onclick = ()=>{ state.currentYM = addMonth(state.currentYM,-1); save(); render(); };
+document.getElementById('hnNext').onclick = ()=>{ state.currentYM = addMonth(state.currentYM,1); save(); render(); };
+document.getElementById('hnYm').onchange = e=>{ if(e.target.value){ state.currentYM = e.target.value; save(); render(); } };
+document.getElementById('hnGoCal').onclick = ()=>{ currentTab='cal'; render(); };
 document.getElementById('hnSave').onclick = saveHomeNoticePNG;
 
 // 通所日の設定
 document.getElementById('mcal').onchange = e=>{
   const t = e.target, ym = state.currentYM;
-  if(t.dataset.satmode){
-    const d = Number(t.dataset.satmode), n = homeUsersOf(ym,d).length;
-    if(t.value==='off' && n && !confirm(`${d}日（土）を休みにすると、この日の在宅予定（${n}人）も削除されます。よろしいですか？`)){ renderCal(); return; }
-    if(setSatMode(ym, d, t.value)) toast('在宅日が変わったため、お知らせを自動の内容に戻しました');
-    hpDraft = null; renderCal();
-  }
+  if(t.dataset.sat) setCal(ym, 'sat', Number(t.dataset.sat), t.checked);
   if(t.dataset.closed) setCal(ym, 'closed', Number(t.dataset.closed), t.checked);
 };
-const setAllSat = mode => { const ym = state.currentYM; let reset = false;
-  const n = homeDays(ym).reduce((t,d)=>t+homeUsersOf(ym,d).length,0);
-  if(mode==='off' && n && !confirm(`土曜日をすべて休みにすると、この月の在宅予定（延べ${n}人）も削除されます。よろしいですか？`)) return;
-  hpDraft = null;
-  for(let d=1; d<=daysIn(ym); d++) if(weekday(ym,d)===6 && !holidayName(ym,d) && satMode(ym,d)!==mode) reset = setSatMode(ym, d, mode) || reset;
-  if(reset) toast('在宅日が変わったため、お知らせを自動の内容に戻しました'); render(); };
-document.getElementById('btnSatHome').onclick = ()=>setAllSat('home');
-document.getElementById('btnSatNone').onclick = ()=>setAllSat('off');
+document.getElementById('btnSatAll').onclick = ()=>{
+  const ym = state.currentYM, c = state.cal[ym] || (state.cal[ym] = {sat:[], closed:[]});
+  c.sat = []; for(let d=1; d<=daysIn(ym); d++) if(weekday(ym,d)===6 && !holidayName(ym,d)) c.sat.push(d);
+  save(); renderCal();
+};
+document.getElementById('btnSatNone').onclick = ()=>{
+  const ym = state.currentYM, c = state.cal[ym] || (state.cal[ym] = {sat:[], closed:[]});
+  c.sat = []; save(); renderCal();
+};
 
 // 利用者の選択（画像出力用。シフトには影響しない）
 document.getElementById('userTable').onchange = e=>{
