@@ -104,15 +104,8 @@ table.list td.num{text-align:right}
 .modal .foot{display:flex;justify-content:flex-end;gap:10px;margin-top:8px}
 #toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:12px 22px;border-radius:8px;display:none;z-index:200;font-size:16px}
 .hidden{display:none!important}
-.sync-badge{padding:6px 12px;font-size:14px;border-radius:16px;border:1px solid #bbb;color:#666;background:#f6f6f6;margin-left:auto;order:3}
-.sync-badge.s-ok{border-color:#9bd1ae;color:#1e7d3a;background:#eaf7ee}
-.sync-badge.s-busy,.sync-badge.s-wait{border-color:#a9c3e0;color:var(--blue);background:var(--blue-l)}
-.sync-badge.s-err,.sync-badge.s-offline{border-color:#e6a1a1;color:var(--bad);background:#fdecea}
-#syncPanel .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px 16px;margin:10px 0}
-#syncPanel label{display:block;font-weight:bold;font-size:15px;margin-bottom:4px}
-#syncPanel input,#syncPanel textarea{font-size:16px;padding:8px 10px;width:100%;font-family:inherit;border:1px solid #aab;border-radius:5px}
-#syncPanel textarea{height:70px;font-family:monospace;font-size:13px;word-break:break-all}
-#syncState{background:#f7f9fb;border:1px solid var(--line);border-radius:6px;padding:10px 12px;margin-bottom:10px}
+#storageBanner .sb-err{background:#fdecea;border:2px solid var(--bad);color:#7a1f16;border-radius:8px;padding:12px 14px;margin-bottom:12px;font-size:15px}
+#storageInfo th{width:9em;white-space:nowrap}
 /* 休業日（日曜・祝日・未指定の土曜・休業日） */
 table.shift th.closed{background:#dcdcdc;color:#888}
 table.shift th.hol{color:var(--bad)}
@@ -165,7 +158,6 @@ input.sel{width:22px;height:22px;vertical-align:middle;cursor:pointer}
   main{padding:8px}
   header{padding:8px 10px;gap:6px 10px}
   header h1{order:0;font-size:16px}
-  .sync-badge{order:1;margin-left:auto;padding:4px 10px;font-size:13px}
   .ym{order:2;width:100%;gap:6px}
   .ym input{flex:1;min-width:0}
   #tab-shift > .panel:first-child .actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
@@ -181,7 +173,6 @@ input.sel{width:22px;height:22px;vertical-align:middle;cursor:pointer}
 
 <header>
   <h1>通所シフト管理</h1>
-  <button id="syncBadge" class="sync-badge s-off" title="同期の設定">同期オフ</button>
   <div class="ym">
     <button class="small" id="prevM">‹ 前月</button>
     <span class="label" id="ymLabel"></span>
@@ -198,6 +189,7 @@ input.sel{width:22px;height:22px;vertical-align:middle;cursor:pointer}
 </nav>
 
 <main>
+  <div id="storageBanner" class="hidden"></div>
   <!-- シフト表 -->
   <section id="tab-shift">
     <div class="panel">
@@ -302,49 +294,22 @@ input.sel{width:22px;height:22px;vertical-align:middle;cursor:pointer}
         <div class="wdsel" id="cwSel"></div>
       </div>
     </div>
-    <div class="panel" id="syncPanel">
-      <h2>スマホ・パソコン間の同期（GitHub）</h2>
-      <div id="syncState"></div>
-      <p class="hint" style="margin-top:0">GitHubの<b>非公開（Private）リポジトリ</b>にデータを保存して、どの端末から開いても同じデータを使えるようにします。設定方法は「GitHub設定手順.txt」をご覧ください。変更は数秒後に自動で送信され、ほかの端末の変更は画面を開いたときに自動で読み込まれます。</p>
-      <div class="grid">
-        <div><label>GitHubのユーザー名</label><input id="syOwner" placeholder="例：yamada-taro" autocomplete="off" autocapitalize="off"></div>
-        <div><label>データ用リポジトリ名（非公開）</label><input id="syRepo" placeholder="例：shift-data" autocomplete="off" autocapitalize="off"></div>
-        <div><label>トークン</label><input id="syToken" type="password" placeholder="github_pat_…" autocomplete="off"></div>
-      </div>
-      <details style="margin-bottom:10px"><summary class="hint" style="cursor:pointer">詳細設定（通常は変更不要）</summary>
-        <div class="grid">
-          <div><label>ファイル名</label><input id="syPath" autocomplete="off" autocapitalize="off"></div>
-          <div><label>ブランチ</label><input id="syBranch" autocomplete="off" autocapitalize="off"></div>
-        </div>
-      </details>
-      <div class="actions">
-        <button class="primary" id="btnSyConnect">接続する</button>
-        <span id="syConnected" class="actions hidden">
-          <button id="btnSyNow">今すぐ同期</button>
-          <button id="btnSyCode">ほかの端末用の設定コードを表示</button>
-          <button class="danger small" id="btnSyOff">この端末の同期をやめる</button>
-        </span>
-      </div>
-      <div id="syCodeBox" class="hidden" style="margin-top:12px">
-        <label>設定コード（ほかの端末の「設定コードで接続」に貼り付けます）</label>
-        <textarea id="syCodeOut" readonly></textarea>
-        <div class="actions" style="margin-top:6px"><button class="small" id="btnSyCopy">コピー</button>
-        <span class="hint">⚠ このコードにはトークンが含まれます。自分の端末以外には送らないでください。</span></div>
-      </div>
-      <div style="margin-top:16px;border-top:1px solid var(--line);padding-top:12px">
-        <label>設定コードで接続（2台目以降のスマホ・パソコン）</label>
-        <textarea id="syCodeIn" placeholder="BSHIFT1:… を貼り付け"></textarea>
-        <div class="actions" style="margin-top:6px"><button class="primary" id="btnSyUseCode">設定コードで接続</button></div>
-      </div>
+    <div class="panel">
+      <h2>データの保存場所</h2>
+      <p class="hint" style="margin-top:0">登録・編集・削除をすると、そのたびに自動で保存されます。「保存」ボタンを押す必要はありません。</p>
+      <div class="list-wrap"><table class="list" id="storageInfo"></table></div>
+      <div id="corruptBox" class="notice hidden" style="margin-top:10px">以前に読み込めなかった保存データが退避されています。
+        <span class="actions" style="margin-top:6px"><button class="small" id="btnCorruptDl">ファイルに保存</button><button class="small danger" id="btnCorruptDel">退避データを削除</button></span></div>
     </div>
     <div class="panel">
-      <h2>バックアップ・復元</h2>
-      <p class="hint">データはこのパソコンのブラウザ内に自動保存されています。念のため、月に1回程度バックアップファイルを保存しておくと安心です。</p>
+      <h2>バックアップ・復元（JSONファイル）</h2>
+      <p class="hint" style="margin-top:0">パソコンの故障やブラウザのデータ削除に備えて、月に1回程度、バックアップファイルを書き出しておくと安心です。書き出したファイルは、ほかのパソコンに移すときにも使えます。</p>
       <div class="actions">
-        <button class="primary" id="btnBackup">バックアップを保存</button>
-        <button id="btnRestore">バックアップから復元</button>
+        <button class="primary" id="btnBackup">バックアップを書き出す（エクスポート）</button>
+        <button id="btnRestore">バックアップを読み込む（インポート）</button>
         <input type="file" id="restoreFile" accept=".json,application/json" class="hidden">
       </div>
+      <div class="actions" style="margin-top:10px"><button class="small hidden" id="btnUndo"></button></div>
     </div>
     <div class="panel">
       <h2>保存されているシフト（月別）</h2>
@@ -352,7 +317,7 @@ input.sel{width:22px;height:22px;vertical-align:middle;cursor:pointer}
     </div>
     <div class="panel">
       <h2>サンプルデータ・初期化</h2>
-      <p class="hint">初めは操作を試せるようにサンプルの利用者が入っています。実際に使い始めるときは「すべてのデータを削除」を押してから、利用者を登録してください。</p>
+      <p class="hint">初めは操作を試せるようにサンプルの利用者が入っています。実際に使い始めるときは「すべてのデータを削除」を押してから、利用者を登録してください。削除の直前の状態は「元に戻す」で1回だけ戻せます。</p>
       <div class="actions">
         <button class="danger" id="btnWipe">すべてのデータを削除して実運用を開始</button>
         <button id="btnSample">サンプルデータを読み込む</button>
@@ -542,33 +507,288 @@ function dayInfo(ym,d){
 }
 const isOpen = (ym,d) => dayInfo(ym,d).open;
 function openDays(ym){ const r=[]; for(let d=1; d<=daysIn(ym); d++) if(isOpen(ym,d)) r.push(d); return r; }
-function save(){
-  try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
-  catch(e){ alert('データを保存できませんでした。\n' + e.message); }
-  if(typeof syncAfterSave === 'function') syncAfterSave();   // GitHub同期（設定している場合）
+/* =========================================================
+   データの保存（このブラウザの localStorage だけを使う）
+   ・外部のサーバーやデータベースには一切送信しない
+   ・保存先は「同じパソコン・同じブラウザ・同じアドレス（オリジン）」ごと
+   ========================================================= */
+const UNDO_KEY    = 'btype-shift-undo-v1';      // インポート・初期化の直前の状態（1つだけ）
+const CORRUPT_KEY = 'btype-shift-corrupt-v1';   // 読み込めなかった保存データの退避先
+const LEGACY_SYNC_KEYS = ['btype-shift-sync-cfg', 'btype-shift-sync-meta', 'btype-shift-conflict-backup'];  // 旧GitHub同期（廃止）
+const EXPORT_APP = 'btype-shift', EXPORT_FORMAT = 1;
+let storageOK = true, storageProblem = '', saveErrorShown = false, saveBlocked = false;
+let lastSavedJSON = null, lastSavedAt = null, storagePersisted = null;
+const startupNotices = [];
+
+function storageAvailable(){
+  try{ const k='__btype_test__'; localStorage.setItem(k,'1'); const ok = localStorage.getItem(k)==='1'; localStorage.removeItem(k); return ok; }
+  catch(e){ return false; }
 }
-function load(){
+function save(){
+  if(saveBlocked) return false;
+  let json;
+  try{ json = JSON.stringify(state); }
+  catch(e){ return reportSaveError('データをJSONに変換できませんでした（' + e.message + '）', false); }
   try{
-    const s = localStorage.getItem(STORE_KEY);
-    if(s){
-      state = JSON.parse(s);
+    localStorage.setItem(STORE_KEY, json);
+    if(localStorage.getItem(STORE_KEY) !== json) throw new Error('保存した内容を読み直したところ、一致しませんでした');
+    lastSavedJSON = json; lastSavedAt = new Date();
+    if(!storageOK){ storageOK = true; storageProblem = ''; saveErrorShown = false; renderStorageBanner(); toast('保存できるようになりました'); }
+    return true;
+  }catch(e){
+    const quota = e && (e.name==='QuotaExceededError' || e.name==='NS_ERROR_DOM_QUOTA_REACHED' || e.code===22 || e.code===1014);
+    return reportSaveError(quota ? 'ブラウザの保存容量がいっぱいです' : (e && e.message) || '原因不明のエラー', quota);
+  }
+}
+function reportSaveError(msg, quota){
+  storageOK = false; storageProblem = msg;
+  renderStorageBanner();
+  if(!saveErrorShown){
+    saveErrorShown = true;
+    alert('⚠ データを保存できませんでした。\n\n原因：' + msg + '\n\n' +
+      (quota ? '不要な月のシフトを「設定・バックアップ」→「保存されているシフト」から削除すると、保存できるようになることがあります。'
+             : 'プライベート（シークレット）ウィンドウで開いている場合や、ブラウザの設定で「サイトデータの保存」が禁止されている場合は保存できません。') +
+      '\n\nこのまま閉じると、今の変更は失われます。\n先に「設定・バックアップ」→「バックアップを書き出す」でファイルに保存してください。');
+  }
+  return false;
+}
+function renderStorageBanner(){
+  const el = document.getElementById('storageBanner'); if(!el) return;
+  const parts = [];
+  if(!storageOK) parts.push(`<div class="sb-err"><b>⚠ データを保存できていません：</b>${esc(storageProblem)}。
+      今の変更はこのページを閉じると失われます。
+      <span class="actions" style="margin-top:6px"><button class="small primary" data-sb="export">バックアップを書き出す</button>
+      <button class="small" data-sb="retry">もう一度保存を試す</button></span></div>`);
+  if(saveBlocked) parts.push(`<div class="sb-err"><b>⚠ 以前の保存データを読み込めませんでした。</b>上書きを防ぐため、保存を止めています。
+      まず元のデータをファイルに保存してください。
+      <span class="actions" style="margin-top:6px"><button class="small primary" data-sb="corrupt">読み込めなかったデータをファイルに保存</button>
+      <button class="small" data-sb="unblock">保存を再開する（元のデータは消えます）</button></span></div>`);
+  el.innerHTML = parts.join('');
+  el.classList.toggle('hidden', !parts.length);
+}
+function downloadText(text, fname, type='application/json'){
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([text], {type})); a.download = fname;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 10000);
+}
+const stamp = () => { const d=new Date(); return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}_${pad2(d.getHours())}${pad2(d.getMinutes())}`; };
+
+/* ---------- 起動時の読み込み（移行処理つき） ---------- */
+function load(){
+  // 廃止したGitHub同期の設定（トークンを含む）をこの端末から削除する
+  try{
+    if(localStorage.getItem('btype-shift-sync-cfg') !== null)
+      startupNotices.push('以前の「GitHub同期」の設定（トークン）をこのブラウザから削除しました。データはこれまでどおりこのブラウザに保存されます。');
+    for(const k of LEGACY_SYNC_KEYS) localStorage.removeItem(k);
+  }catch(e){}
+
+  if(!storageAvailable()){
+    storageOK = false;
+    storageProblem = 'このブラウザでは、サイトのデータ保存が使えない状態です（プライベートウィンドウ、またはブラウザの設定で保存が禁止されています）';
+    state = defaultState(); loadSample();
+    return;
+  }
+  let raw = null;
+  try{ raw = localStorage.getItem(STORE_KEY); }catch(e){}
+  if(raw){
+    try{
+      const parsed = JSON.parse(raw);
+      const v = validateData(parsed);
+      if(!v.ok) throw new Error(v.error);
+      state = v.data;
       const oldVer = state.version || 1;
       normalize();
+      let migrated = false;
       // 以前の版のサンプルデータ（28人）のままなら、新しいテストデータ（22人）に入れ替える
-      if(oldVer < 3 && isOldSample()){ state.months = {}; loadSample(); save(); }
+      if(oldVer < 3 && isOldSample()){ state.months = {}; loadSample(); migrated = true; }
       // 版3まで「月曜は休業日」だった設定を解除（月〜金は基本通所日）
       if(oldVer < 4){
         if(JSON.stringify(state.closedWeekdays)==='[1]') state.closedWeekdays = [];
-        if(isTestSample()) state.months = {};   // テストデータのシフトは新しいルールで作り直す
+        if(isTestSample()) state.months = {};
+        migrated = true;
+      }
+      if(migrated || JSON.stringify(state) !== raw){
+        // 移行の前に、念のため元の保存データを控えておく
+        if(oldVer < (defaultState().version)) writeUndo('版の更新（自動移行）', JSON.parse(raw));
         save();
+      }else{ lastSavedJSON = raw; }
+      return;
+    }catch(e){
+      // 読み込めないデータは上書きせず退避する
+      let backedUp = false;
+      try{ localStorage.setItem(CORRUPT_KEY, JSON.stringify({at:Date.now(), error:String(e.message||e), raw})); backedUp = true; }catch(_){}
+      state = defaultState();
+      if(backedUp){
+        startupNotices.push('以前の保存データを読み込めなかったため、別の場所に退避しました（「設定・バックアップ」からファイルに保存できます）。原因：' + (e.message||e));
+      }else{
+        saveBlocked = true;      // 退避できない場合は、元データを守るため保存を止める
+        window.__corruptRaw = raw;
       }
       return;
     }
-  }catch(e){ alert('保存データの読み込みに失敗しました。バックアップから復元してください。'); }
-  state = defaultState();
-  loadSample();
-  save();
+  }
+  // 初めて開いたとき：サンプルデータ
+  state = defaultState(); loadSample(); save();
 }
+
+/* ---------- データ形式の検証 ---------- */
+// 書き出したファイル（{app, format, exportedAt, data}）と、以前の形式（データそのもの）の両方に対応
+function validateData(input){
+  const fail = msg => ({ok:false, error:msg});
+  if(!input || typeof input !== 'object' || Array.isArray(input)) return fail('データの形式が違います');
+  let data = input, exportedAt = null;
+  if(input.app !== undefined || input.format !== undefined){
+    if(input.app !== EXPORT_APP) return fail('このアプリのバックアップファイルではありません');
+    if(typeof input.format !== 'number' || input.format > EXPORT_FORMAT) return fail('新しい版のアプリで書き出されたファイルです。アプリを最新にしてください');
+    data = input.data; exportedAt = input.exportedAt || null;
+    if(!data || typeof data !== 'object') return fail('ファイルの中にデータがありません');
+  }
+  const isInt = (v,min,max) => Number.isInteger(v) && v>=min && v<=max;
+  const YM = /^\d{4}-(0[1-9]|1[0-2])$/, DATE = /^\d{4}-\d{2}-\d{2}$/;
+  if(!Array.isArray(data.users)) return fail('利用者の一覧（users）がありません');
+  const ids = new Set();
+  for(const [i,u] of data.users.entries()){
+    const at = `利用者${i+1}人目`;
+    if(!u || typeof u !== 'object') return fail(`${at}のデータが壊れています`);
+    if(typeof u.id !== 'string' || !u.id) return fail(`${at}のIDがありません`);
+    if(ids.has(u.id)) return fail(`${at}のIDが重複しています`);
+    ids.add(u.id);
+    if(typeof u.name !== 'string' || !u.name.trim() || u.name.length > 50) return fail(`${at}の名字が正しくありません`);
+    if(!(u.desired===null || u.desired===undefined || u.desired==='' || isInt(u.desired,0,31))) return fail(`${u.name}さんの通所希望日数が正しくありません`);
+    if(u.ngWeekdays!==undefined && !(Array.isArray(u.ngWeekdays) && u.ngWeekdays.every(w=>isInt(w,0,6)))) return fail(`${u.name}さんの通所できない曜日が正しくありません`);
+    if(u.ngDates!==undefined && !(Array.isArray(u.ngDates) && u.ngDates.every(s=>typeof s==='string' && DATE.test(s)))) return fail(`${u.name}さんの個別の不可日が正しくありません`);
+    if(u.active!==undefined && typeof u.active!=='boolean') return fail(`${u.name}さんの有効・無効が正しくありません`);
+  }
+  if(data.months===undefined) data.months = {};
+  if(typeof data.months!=='object' || Array.isArray(data.months)) return fail('シフト（months）の形式が違います');
+  let shiftDays = 0, notes = 0;
+  for(const ym in data.months){
+    if(!YM.test(ym)) return fail(`シフトの年月「${ym}」が正しくありません`);
+    const m = data.months[ym];
+    if(!m || typeof m!=='object') return fail(`${ym}のシフトが壊れています`);
+    if(m.assign!==undefined){
+      if(typeof m.assign!=='object') return fail(`${ym}のシフトが壊れています`);
+      for(const id in m.assign){
+        if(!Array.isArray(m.assign[id]) || !m.assign[id].every(d=>isInt(d,1,31))) return fail(`${ym}のシフトの日付が正しくありません`);
+        shiftDays += m.assign[id].length;
+      }
+    }
+    if(m.notes!==undefined){
+      if(typeof m.notes!=='object') return fail(`${ym}の備考が壊れています`);
+      for(const id in m.notes) for(const d in m.notes[id]){
+        if(typeof m.notes[id][d]!=='string') return fail(`${ym}の備考が正しくありません`);
+        notes++;
+      }
+    }
+  }
+  if(data.cal!==undefined){
+    if(typeof data.cal!=='object' || Array.isArray(data.cal)) return fail('通所日の設定（cal）の形式が違います');
+    for(const ym in data.cal){
+      const c = data.cal[ym];
+      if(!YM.test(ym) || !c || typeof c!=='object') return fail(`通所日の設定「${ym}」が正しくありません`);
+      if((c.sat && !(Array.isArray(c.sat) && c.sat.every(d=>isInt(d,1,31)))) || (c.closed && !(Array.isArray(c.closed) && c.closed.every(d=>isInt(d,1,31))))) return fail(`通所日の設定「${ym}」の日付が正しくありません`);
+    }
+  }
+  if(data.capacity!==undefined && !isInt(data.capacity,1,200)) return fail('1日の定員が正しくありません');
+  if(data.dailyTarget!==undefined && !isInt(data.dailyTarget,0,200)) return fail('1日の目標人数が正しくありません');
+  if(data.closedWeekdays!==undefined && !(Array.isArray(data.closedWeekdays) && data.closedWeekdays.every(w=>isInt(w,0,6)))) return fail('休業曜日の設定が正しくありません');
+  if(data.currentYM!==undefined && !(typeof data.currentYM==='string' && YM.test(data.currentYM))) data.currentYM = undefined;
+  return {ok:true, data, exportedAt, summary:{users:data.users.length, months:Object.keys(data.months).sort(), shiftDays, notes}};
+}
+const describe = s => `利用者 ${s.users}人／シフト ${s.months.length}か月分${s.months.length?`（${s.months.map(ymLabel).join('、')}）`:''}／備考 ${s.notes}件`;
+
+/* ---------- 直前の状態（インポート・初期化の前） ---------- */
+function writeUndo(action, data){
+  try{ localStorage.setItem(UNDO_KEY, JSON.stringify({at:Date.now(), action, data: data || state})); return true; }
+  catch(e){ return false; }
+}
+function readUndo(){ try{ return JSON.parse(localStorage.getItem(UNDO_KEY)); }catch(e){ return null; } }
+// 大きな置き換えの前に呼ぶ。控えを残せないときは確認する
+function prepareReplace(action){
+  if(writeUndo(action)) return true;
+  return confirm('今のデータの控え（元に戻す用）を残せませんでした（保存容量の不足など）。\n\n先に「バックアップを書き出す」でファイルに保存することをおすすめします。\nこのまま続けますか？');
+}
+function replaceState(next){
+  const prev = state;
+  try{ state = next; normalize(); }
+  catch(e){ state = prev; throw e; }
+  if(!save()){ /* 保存できなかった場合もメモリ上の内容は表示する（警告は save() が表示） */ }
+}
+
+/* ---------- 書き出し（エクスポート） ---------- */
+function backup(){
+  const json = JSON.stringify({app:EXPORT_APP, format:EXPORT_FORMAT, exportedAt:new Date().toISOString(), data:state}, null, 1);
+  const fname = `シフトバックアップ_${stamp()}.json`;
+  downloadText(json, fname);
+  toast(`「${fname}」を書き出しました（ダウンロードフォルダ）`);
+}
+/* ---------- 読み込み（インポート） ---------- */
+function restore(file){
+  if(file.size > 5*1024*1024){ alert('ファイルが大きすぎます（5MBまで）。シフトのバックアップファイルを選んでください。'); return; }
+  const r = new FileReader();
+  r.onerror = ()=>alert('ファイルを読み込めませんでした。');
+  r.onload = ()=>{
+    let parsed;
+    try{ parsed = JSON.parse(String(r.result).replace(/^﻿/,'')); }
+    catch(e){ alert('このファイルはJSON形式として読み込めません。\n「バックアップを書き出す」で作ったファイル（.json）を選んでください。'); return; }
+    const v = validateData(parsed);
+    if(!v.ok){ alert('このファイルは復元できません。\n\n理由：' + v.error + '\n\n現在のデータは変更していません。'); return; }
+    const cur = validateData(JSON.parse(JSON.stringify(state)));
+    const when = v.exportedAt ? new Date(v.exportedAt).toLocaleString('ja-JP') : '不明（以前の形式のファイル）';
+    if(!confirm('バックアップから復元します。現在のデータは、このファイルの内容で上書きされます。\n\n' +
+      `【現在のデータ】\n${describe(cur.summary)}\n\n【ファイルの内容】\n${describe(v.summary)}\n書き出した日時：${when}\n\n` +
+      '※ 復元の直前の状態は、「元に戻す」で1回だけ戻せます。\n\n上書きしてよろしいですか？')) return;
+    if(!prepareReplace('バックアップから復元')) return;
+    try{ replaceState(JSON.parse(JSON.stringify(v.data))); }
+    catch(e){ alert('復元中にエラーが発生したため、中止しました。現在のデータは変更していません。\n' + e.message); return; }
+    render(); toast('バックアップから復元しました');
+  };
+  r.readAsText(file);
+}
+function undoLast(){
+  const u = readUndo(); if(!u){ toast('戻せる状態がありません'); return; }
+  const v = validateData(u.data);
+  if(!v.ok){ alert('控えのデータが壊れているため戻せません。'); return; }
+  if(!confirm(`${new Date(u.at).toLocaleString('ja-JP')} の「${u.action}」の直前の状態に戻します。\n\n【戻す内容】\n${describe(v.summary)}\n\n今のデータは、この内容で上書きされます。よろしいですか？`)) return;
+  const nowCopy = JSON.parse(JSON.stringify(state));
+  try{ replaceState(JSON.parse(JSON.stringify(v.data))); }
+  catch(e){ alert('戻す途中でエラーが発生したため、中止しました。\n' + e.message); return; }
+  writeUndo('元に戻す', nowCopy);      // もう一度押せば、戻す前に戻れる
+  render(); toast('直前の状態に戻しました');
+}
+
+/* ---------- 保存の状態の表示 ---------- */
+function renderStoragePanel(){
+  const el = document.getElementById('storageInfo'); if(!el) return;
+  let size = 0; try{ size = (localStorage.getItem(STORE_KEY)||'').length; }catch(e){}
+  const origin = location.protocol==='file:' ? 'パソコン内のファイル（file://）' : location.origin;
+  el.innerHTML = `
+    <tr><th>保存先</th><td>このブラウザの中（localStorage）。外部には送信しません。</td></tr>
+    <tr><th>保存の単位</th><td>${esc(origin)} ／ このブラウザ<br><span class="hint">別のブラウザや別のアドレスで開くと、別のデータになります。</span></td></tr>
+    <tr><th>状態</th><td>${storageOK && !saveBlocked ? '<span class="result-ok">✔ 正常に保存されています</span>' : '<span class="result-ng">⚠ 保存できていません</span>'}${lastSavedAt?`<br><span class="hint">最後に保存：${lastSavedAt.toLocaleString('ja-JP')}</span>`:''}</td></tr>
+    <tr><th>データ量</th><td>${(size/1024).toFixed(1)} KB（目安の上限：約5,000 KB）</td></tr>
+    <tr><th>自動削除の防止</th><td>${storagePersisted===true?'有効（ブラウザが自動でデータを消さない設定です）':storagePersisted===false?'ブラウザの判断に任されています（容量不足のときなどに消える可能性があります）':'確認中…'}</td></tr>`;
+  const u = readUndo();
+  const ub = document.getElementById('btnUndo');
+  ub.classList.toggle('hidden', !u);
+  if(u) ub.textContent = `元に戻す（${new Date(u.at).toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})}の「${u.action}」の前）`;
+  let corrupt = null; try{ corrupt = localStorage.getItem(CORRUPT_KEY); }catch(e){}
+  document.getElementById('corruptBox').classList.toggle('hidden', !corrupt);
+}
+
+/* ---------- 別のタブで変更されたとき ---------- */
+window.addEventListener('storage', e=>{
+  if(e.key !== STORE_KEY || e.newValue === null || e.newValue === lastSavedJSON) return;
+  try{
+    const v = validateData(JSON.parse(e.newValue)); if(!v.ok) return;
+    const ym = state.currentYM;
+    state = v.data; normalize(); state.currentYM = ym;
+    lastSavedJSON = e.newValue;
+    render(); toast('別のタブで変更された内容を読み込みました');
+  }catch(_){}
+});
+
 function normalize(){
   const d = defaultState();
   for(const k of Object.keys(d)) if(state[k]===undefined) state[k]=d[k];
@@ -917,7 +1137,7 @@ function render(){
   }
   if(currentTab==='cal') renderCal();
   if(currentTab==='users') renderUsers();
-  if(currentTab==='settings'){ renderSettings(); if(typeof renderSyncPanel==='function') renderSyncPanel(); }
+  if(currentTab==='settings'){ renderSettings(); renderStoragePanel(); }
 }
 
 function renderShift(){
@@ -1769,29 +1989,6 @@ function renderPngModal(){
 /* =========================================================
    バックアップ・復元
    ========================================================= */
-function backup(){
-  const d = new Date();
-  const fname = `シフトバックアップ_${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}.json`;
-  const blob = new Blob([JSON.stringify(state, null, 1)], {type:'application/json'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob); a.download = fname;
-  document.body.appendChild(a); a.click(); a.remove();
-  toast(`「${fname}」を保存しました`);
-}
-function restore(file){
-  const r = new FileReader();
-  r.onload = ()=>{
-    try{
-      const s = JSON.parse(r.result);
-      if(!Array.isArray(s.users) || typeof s.months!=='object') throw new Error('形式が違います');
-      if(!confirm(`バックアップ（利用者 ${s.users.length}人、シフト ${Object.keys(s.months).length}か月分）で、現在のデータを置き換えます。よろしいですか？`)) return;
-      state = s; normalize(); save(); render();
-      toast('復元しました');
-    }catch(e){ alert('このファイルは復元できません。シフトのバックアップファイル（.json）を選んでください。'); }
-  };
-  r.readAsText(file);
-}
-
 /* =========================================================
    イベント
    ========================================================= */
@@ -1951,6 +2148,16 @@ document.getElementById('cwSel').onchange = e=>{
   toast(`休業曜日：${state.closedWeekdays.map(x=>WD[x]).join('・')||'なし'}（作成済みの月は自動シフト作成をやり直してください）`);
 };
 document.getElementById('btnBackup').onclick = backup;
+document.getElementById('btnUndo').onclick = undoLast;
+document.getElementById('btnCorruptDl').onclick = ()=>{ try{ const c = JSON.parse(localStorage.getItem(CORRUPT_KEY)); downloadText(c.raw, `読み込めなかった保存データ_${stamp()}.json`); }catch(e){ alert('退避データを取り出せませんでした。'); } };
+document.getElementById('btnCorruptDel').onclick = ()=>{ if(confirm('退避している「読み込めなかった保存データ」を削除しますか？\n（先にファイルに保存しておくことをおすすめします）')){ try{ localStorage.removeItem(CORRUPT_KEY); }catch(e){} renderStoragePanel(); } };
+document.getElementById('storageBanner').onclick = e=>{
+  const k = e.target.dataset && e.target.dataset.sb; if(!k) return;
+  if(k==='export') backup();
+  if(k==='retry'){ saveErrorShown = true; if(save()) render(); }
+  if(k==='corrupt') downloadText(window.__corruptRaw || '', `読み込めなかった保存データ_${stamp()}.json`);
+  if(k==='unblock' && confirm('保存を再開すると、読み込めなかった元のデータは消えます。\n先にファイルに保存しましたか？')){ saveBlocked = false; save(); renderStorageBanner(); }
+};
 document.getElementById('btnRestore').onclick = ()=>document.getElementById('restoreFile').click();
 document.getElementById('restoreFile').onchange = e=>{ if(e.target.files[0]) restore(e.target.files[0]); e.target.value=''; };
 document.getElementById('monthTable').onclick = e=>{
@@ -1959,252 +2166,31 @@ document.getElementById('monthTable').onclick = e=>{
   if(b.dataset.delm && confirm(`${ymLabel(b.dataset.delm)}のシフトを削除しますか？`)){ delete state.months[b.dataset.delm]; save(); render(); }
 };
 document.getElementById('btnWipe').onclick = ()=>{
-  if(!confirm('利用者とシフトをすべて削除します。元に戻せません。\n（必要なら先に「バックアップを保存」してください）\n\n削除してよろしいですか？')) return;
-  const cap = state.capacity, ym = state.currentYM, cal = state.cal;
-  state = defaultState(); state.capacity = cap; state.currentYM = ym; state.cal = cal;   // 通所日の設定は残す
-  save(); currentTab='users'; render(); toast('すべて削除しました。利用者を登録してください');
+  if(!confirm('利用者・シフト・備考をすべて削除します。\n（定員・目標人数・通所日の設定は残ります）\n\n念のため、先に「バックアップを書き出す」をおすすめします。\n\n削除してよろしいですか？')) return;
+  if(!confirm('本当に削除しますか？（最終確認）\n直前の状態は「元に戻す」で1回だけ戻せます。')) return;
+  if(!prepareReplace('すべてのデータを削除')) return;
+  const keep = {capacity:state.capacity, dailyTarget:state.dailyTarget, closedWeekdays:state.closedWeekdays, cal:state.cal, currentYM:state.currentYM, nextId:state.nextId};
+  replaceState(Object.assign(defaultState(), keep));
+  currentTab='users'; render(); toast('すべて削除しました。利用者を登録してください');
 };
 document.getElementById('btnSample').onclick = ()=>{
-  if(!confirm('現在の利用者とシフトを消して、サンプルデータを読み込みます。よろしいですか？')) return;
+  if(!confirm('現在の利用者とシフトを消して、サンプルデータを読み込みます。\n直前の状態は「元に戻す」で1回だけ戻せます。\n\nよろしいですか？')) return;
+  if(!prepareReplace('サンプルデータの読み込み')) return;
   const ym = state.currentYM;
-  state = defaultState(); state.currentYM = ym; loadSample(); save(); currentTab='shift'; render();
+  const prev = state; state = defaultState(); state.currentYM = ym; loadSample();
+  const next = state; state = prev; replaceState(next);
+  currentTab='shift'; render();
 };
 
-/* =========================================================
-   GitHub同期（スマホ・パソコンのどこからでも同じデータを使う）
-   データは「非公開リポジトリ」の JSON ファイルに保存する。
-   この端末にも控え（localStorage）を残すので、圏外でも使える。
-   ========================================================= */
-const SYNC_CFG_KEY  = 'btype-shift-sync-cfg';    // {owner, repo, token, path, branch}（この端末だけ）
-const SYNC_META_KEY = 'btype-shift-sync-meta';   // {sha, pending, lastHash, lastSyncedAt}
-let syncCfg  = readJSON(SYNC_CFG_KEY)  || null;
-let syncMeta = readJSON(SYNC_META_KEY) || {sha:null, pending:false, lastHash:null, lastSyncedAt:0};
-let syncTimer = null, syncBusy = false, syncStatus = 'off', syncMsg = '';
-function readJSON(k){ try{ return JSON.parse(localStorage.getItem(k)); }catch(e){ return null; } }
-function writeJSON(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
-const syncOn = () => !!(syncCfg && syncCfg.owner && syncCfg.repo && syncCfg.token);
-// 端末ごとの表示状態（表示中の年月・画像用の選択）は比較・同期の対象外
-function dataHash(st){
-  const {currentYM, selected, updatedAt, ...rest} = st;
-  return JSON.stringify(rest);
-}
-const b64enc = str => { const bytes = new TextEncoder().encode(str); let bin=''; for(let i=0;i<bytes.length;i+=0x8000) bin += String.fromCharCode.apply(null, bytes.subarray(i,i+0x8000)); return btoa(bin); };
-const b64dec = b64 => { const bin = atob(b64.replace(/\s/g,'')); const bytes = new Uint8Array(bin.length); for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i); return new TextDecoder().decode(bytes); };
-
-async function ghFetch(path, method='GET', body){
-  const url = `https://api.github.com${path}`;
-  const res = await fetch(url, {
-    method, cache:'no-store',
-    headers:{'Authorization':`Bearer ${syncCfg.token}`, 'Accept':'application/vnd.github+json', 'X-GitHub-Api-Version':'2022-11-28', ...(body?{'Content-Type':'application/json'}:{})},
-    body: body ? JSON.stringify(body) : undefined
-  });
-  let json = null; try{ json = await res.json(); }catch(e){}
-  return {status:res.status, json};
-}
-const filePath = () => `/repos/${encodeURIComponent(syncCfg.owner)}/${encodeURIComponent(syncCfg.repo)}/contents/${(syncCfg.path||'shift-data.json').split('/').map(encodeURIComponent).join('/')}`;
-function ghError(r){
-  if(r.status===401) return 'トークンが正しくないか、期限切れです';
-  if(r.status===403) return 'トークンに書き込みの権限がありません（Contents：Read and write が必要です）';
-  if(r.status===404) return 'リポジトリが見つかりません（ユーザー名・リポジトリ名・トークンの対象リポジトリを確認してください）';
-  return `GitHubとの通信でエラーが発生しました（${r.status}）`;
-}
-// GitHub上のデータを取得 → {exists, data, sha}
-async function pullRemote(){
-  const r = await ghFetch(filePath() + `?ref=${encodeURIComponent(syncCfg.branch||'main')}`);
-  if(r.status===404){
-    const repo = await ghFetch(`/repos/${encodeURIComponent(syncCfg.owner)}/${encodeURIComponent(syncCfg.repo)}`);
-    if(repo.status===200) return {exists:false};
-    throw new Error(ghError(repo));
-  }
-  if(r.status!==200) throw new Error(ghError(r));
-  let text;
-  if(r.json.content) text = b64dec(r.json.content);
-  else { // 1MBを超える場合
-    const raw = await ghFetch(`/repos/${encodeURIComponent(syncCfg.owner)}/${encodeURIComponent(syncCfg.repo)}/git/blobs/${r.json.sha}`);
-    text = b64dec(raw.json.content);
-  }
-  return {exists:true, data:JSON.parse(text), sha:r.json.sha};
-}
-async function putRemote(sha){
-  const body = {message:`シフトデータ更新 ${new Date().toLocaleString('ja-JP')}`, content:b64enc(JSON.stringify(state, null, 1)), branch:syncCfg.branch||'main'};
-  if(sha) body.sha = sha;
-  return ghFetch(filePath(), 'PUT', body);
-}
-function setSync(status, msg){
-  syncStatus = status; syncMsg = msg || '';
-  const el = document.getElementById('syncBadge');
-  if(el){
-    const t = {off:'同期オフ', ok:'☁ 同期済み', busy:'☁ 同期中…', wait:'☁ 送信待ち', err:'⚠ 同期エラー', offline:'⚠ オフライン'}[status];
-    el.textContent = t; el.className = 'sync-badge s-' + status; el.title = syncMsg || t;
-  }
-  const st = document.getElementById('syncState');
-  if(st) st.innerHTML = syncOn()
-    ? `<b>${esc({ok:'同期済み', busy:'同期中…', wait:'送信待ち', err:'同期エラー', offline:'オフライン（電波が戻ったら自動で送信します）', off:'同期オフ'}[status])}</b>${syncMsg?'：'+esc(syncMsg):''}` +
-      (syncMeta.lastSyncedAt ? `<br><span class="hint">最終同期：${new Date(syncMeta.lastSyncedAt).toLocaleString('ja-JP')}</span>` : '')
-    : '同期していません（この端末の中だけに保存されています）';
-}
-function saveMeta(){ writeJSON(SYNC_META_KEY, syncMeta); }
-// 他の端末のデータを取り込む（表示中の年月・選択はこの端末のまま）
-function adoptRemote(data, sha){
-  const keepYM = state ? state.currentYM : null, keepSel = state ? state.selected : [];
-  state = data; normalize();
-  if(keepYM) state.currentYM = keepYM;
-  state.selected = (keepSel||[]).filter(id=>state.users.some(u=>u.id===id));
-  try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){}
-  syncMeta = {sha, pending:false, lastHash:dataHash(state), lastSyncedAt:Date.now()}; saveMeta();
-}
-// save() から呼ばれる：内容が変わっていたら少し待ってGitHubへ送る
-function syncAfterSave(){
-  if(!syncOn()) return;
-  if(dataHash(state) === syncMeta.lastHash && !syncMeta.pending) return;   // 年月の移動など、データが変わっていない
-  syncMeta.pending = true; saveMeta();
-  setSync('wait');
-  clearTimeout(syncTimer);
-  syncTimer = setTimeout(()=>pushNow(), 2500);
-}
-async function pushNow(){
-  if(!syncOn() || syncBusy) return;
-  if(!navigator.onLine){ setSync('offline'); return; }
-  syncBusy = true; setSync('busy');
-  try{
-    let r = await putRemote(syncMeta.sha);
-    if(r.status===409 || r.status===422 || (r.status===404 && syncMeta.sha)){
-      // 他の端末が先に更新していた
-      const rem = await pullRemote();
-      if(rem.exists && dataHash(rem.data) !== syncMeta.lastHash){
-        const useRemote = confirm('他の端末（スマホ・パソコン）で、このあとに別の変更が保存されています。\n\n' +
-          '［OK］＝ 他の端末の内容を使う（この端末で今した変更は取り消し）\n' +
-          '［キャンセル］＝ この端末の内容で上書きする');
-        if(useRemote){
-          writeJSON('btype-shift-conflict-backup', state);   // 念のため控えを残す
-          adoptRemote(rem.data, rem.sha); render(); setSync('ok', '他の端末の内容を読み込みました');
-          return;
-        }
-      }
-      r = await putRemote(rem.exists ? rem.sha : null);
-    }
-    if(r.status===200 || r.status===201){
-      syncMeta = {sha:r.json.content.sha, pending:false, lastHash:dataHash(state), lastSyncedAt:Date.now()}; saveMeta();
-      setSync('ok');
-    }else{
-      setSync('err', ghError(r));
-    }
-  }catch(e){
-    setSync(navigator.onLine ? 'err' : 'offline', navigator.onLine ? e.message : '');
-  }finally{
-    syncBusy = false;
-    if(syncMeta.pending && syncStatus==='ok') syncAfterSave();   // 送信中にさらに変更があった
-  }
-}
-// 他の端末の変更を確認して取り込む（起動時・画面に戻ったとき・1分ごと）
-async function pullNow(silent){
-  if(!syncOn() || syncBusy) return;
-  if(syncMeta.pending){ pushNow(); return; }       // 未送信の変更があれば先に送る
-  if(!navigator.onLine){ setSync('offline'); return; }
-  syncBusy = true; if(!silent) setSync('busy');
-  try{
-    const rem = await pullRemote();
-    if(!rem.exists){ syncBusy=false; syncMeta.pending = true; saveMeta(); return pushNow(); }
-    if(rem.sha !== syncMeta.sha){
-      const changed = dataHash(rem.data) !== dataHash(state);
-      adoptRemote(rem.data, rem.sha);
-      if(changed){ render(); toast('他の端末で保存された変更を読み込みました'); }
-    }
-    syncMeta.lastSyncedAt = Date.now(); saveMeta();
-    setSync('ok');
-  }catch(e){
-    setSync(navigator.onLine ? 'err' : 'offline', navigator.onLine ? e.message : '');
-  }finally{ syncBusy = false; }
-}
-// 初めて接続するとき
-async function connectSync(cfg){
-  const prev = syncCfg;
-  syncCfg = {owner:cfg.owner.trim(), repo:cfg.repo.trim(), token:cfg.token.trim(), path:(cfg.path||'shift-data.json').trim(), branch:(cfg.branch||'main').trim()};
-  setSync('busy', '接続を確認しています');
-  try{
-    const repo = await ghFetch(`/repos/${encodeURIComponent(syncCfg.owner)}/${encodeURIComponent(syncCfg.repo)}`);
-    if(repo.status!==200) throw new Error(ghError(repo));
-    if(repo.json && repo.json.private === false &&
-       !confirm('このリポジトリは「公開（Public）」です。利用者の名前が誰でも見られる状態になります。\n\n非公開（Private）のリポジトリを使うことを強くおすすめします。\nそれでも続けますか？')) throw new Error('中止しました（非公開リポジトリを指定してください）');
-    const rem = await pullRemote();
-    writeJSON(SYNC_CFG_KEY, syncCfg);
-    if(rem.exists){
-      const use = confirm(`GitHubに保存済みのデータがあります（利用者 ${rem.data.users.length}人、シフト ${Object.keys(rem.data.months||{}).length}か月分）。\n\n` +
-        '［OK］＝ GitHubのデータを使う（ほかの端末と同じデータになります）\n［キャンセル］＝ この端末のデータでGitHubを上書きする');
-      if(use){ adoptRemote(rem.data, rem.sha); render(); setSync('ok', 'GitHubのデータを読み込みました'); return true; }
-      syncMeta = {sha:rem.sha, pending:true, lastHash:null, lastSyncedAt:0}; saveMeta();
-    }else{
-      syncMeta = {sha:null, pending:true, lastHash:null, lastSyncedAt:0}; saveMeta();
-    }
-    await pushNow();
-    return syncStatus==='ok';
-  }catch(e){
-    syncCfg = prev; setSync(syncOn()?'err':'off', e.message);
-    alert('接続できませんでした。\n' + e.message);
-    return false;
-  }
-}
-function disconnectSync(){
-  syncCfg = null; localStorage.removeItem(SYNC_CFG_KEY);
-  syncMeta = {sha:null, pending:false, lastHash:null, lastSyncedAt:0}; saveMeta();
-  setSync('off');
-}
-// 設定コード（他の端末へ設定を移すための文字列）
-const makeSetupCode = () => 'BSHIFT1:' + b64enc(JSON.stringify(syncCfg));
-function parseSetupCode(code){
-  const c = String(code).trim().replace(/^BSHIFT1:/,'');
-  const o = JSON.parse(b64dec(c));
-  if(!o.owner || !o.repo || !o.token) throw new Error('設定コードが正しくありません');
-  return o;
-}
-function renderSyncPanel(){
-  const f = id => document.getElementById(id);
-  if(!f('syOwner')) return;
-  f('syOwner').value  = syncCfg ? syncCfg.owner : (f('syOwner').value||'');
-  f('syRepo').value   = syncCfg ? syncCfg.repo  : (f('syRepo').value||'shift-data');
-  f('syToken').value  = syncCfg ? syncCfg.token : '';
-  f('syPath').value   = syncCfg ? syncCfg.path  : 'shift-data.json';
-  f('syBranch').value = syncCfg ? syncCfg.branch: 'main';
-  f('syConnected').classList.toggle('hidden', !syncOn());
-  f('btnSyConnect').textContent = syncOn() ? '設定を保存して再接続' : '接続する';
-  setSync(syncOn() ? syncStatus : 'off', syncMsg);
-}
-function initSyncEvents(){
-  const f = id => document.getElementById(id);
-  f('syncBadge').onclick = ()=>{ currentTab='settings'; render(); setTimeout(()=>f('syncPanel').scrollIntoView({behavior:'smooth'}),50); };
-  f('btnSyConnect').onclick = async ()=>{
-    const cfg = {owner:f('syOwner').value, repo:f('syRepo').value, token:f('syToken').value, path:f('syPath').value, branch:f('syBranch').value};
-    if(!cfg.owner.trim() || !cfg.repo.trim() || !cfg.token.trim()){ alert('ユーザー名・リポジトリ名・トークンを入力してください。'); return; }
-    if(await connectSync(cfg)) toast('GitHubと接続しました。これからは自動で同期されます');
-    renderSyncPanel();
-  };
-  f('btnSyNow').onclick = async ()=>{ await pullNow(false); renderSyncPanel(); if(syncStatus==='ok') toast('最新の状態です'); };
-  f('btnSyOff').onclick = ()=>{ if(confirm('この端末の同期をやめますか？\n（GitHub上のデータとこの端末のデータは消えません）')){ disconnectSync(); renderSyncPanel(); } };
-  f('btnSyCode').onclick = ()=>{
-    f('syCodeOut').value = makeSetupCode(); f('syCodeBox').classList.remove('hidden'); f('syCodeOut').select();
-  };
-  f('btnSyCopy').onclick = async ()=>{
-    try{ await navigator.clipboard.writeText(f('syCodeOut').value); toast('設定コードをコピーしました'); }
-    catch(e){ f('syCodeOut').select(); document.execCommand('copy'); toast('設定コードをコピーしました'); }
-  };
-  f('btnSyUseCode').onclick = async ()=>{
-    let cfg; try{ cfg = parseSetupCode(f('syCodeIn').value); }catch(e){ alert('設定コードが正しくありません。もう一度コピーして貼り付けてください。'); return; }
-    if(await connectSync(cfg)){ f('syCodeIn').value=''; toast('GitHubと接続しました'); }
-    renderSyncPanel();
-  };
-  // 画面に戻ったとき・電波が戻ったとき・1分ごとに確認
-  document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='visible') pullNow(true); else if(syncMeta.pending){ clearTimeout(syncTimer); pushNow(); } });
-  window.addEventListener('online', ()=>pullNow(true));
-  window.addEventListener('offline', ()=>syncOn() && setSync('offline'));
-  setInterval(()=>{ if(document.visibilityState==='visible') pullNow(true); }, 60000);
-  window.addEventListener('beforeunload', e=>{ if(syncOn() && syncMeta.pending){ pushNow(); e.preventDefault(); e.returnValue=''; } });
-}
 
 load();
-initSyncEvents();
 render();
-renderSyncPanel();
-if(syncOn()){ setSync('busy'); pullNow(false); }
+renderStorageBanner();
+if(startupNotices.length) setTimeout(()=>alert(startupNotices.join('\n\n')), 300);
+// ブラウザに「このサイトのデータを自動で消さない」よう依頼する（外部通信はしない）
+if(navigator.storage && navigator.storage.persist){
+  navigator.storage.persisted().then(p=> p ? p : navigator.storage.persist()).then(p=>{ storagePersisted = !!p; if(currentTab==='settings') renderStoragePanel(); }).catch(()=>{ storagePersisted = false; });
+}else storagePersisted = false;
 </script>
 </body>
 </html>
