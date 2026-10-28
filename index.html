@@ -108,6 +108,7 @@ table.list td.num{text-align:right}
 #storageInfo th{width:9em;white-space:nowrap}
 /* 休業日（日曜・祝日・未指定の土曜・休業日） */
 table.shift th.closed{background:#dcdcdc;color:#888}
+table.shift th.closed.home{background:#efe3c2;color:#7a5f1e}
 table.shift th.hol{color:var(--bad)}
 table.shift td.c.closed{background:#d9d9d9;cursor:not-allowed}
 table.shift td.c.closed.on{background:#f4b6b6;color:var(--bad)}
@@ -124,12 +125,14 @@ table.mcal td.k-wd{background:#fff}
 table.mcal td.k-sun,table.mcal td.k-hol{background:#ffecec;color:var(--bad)}
 table.mcal td.k-satoff{background:#eef0f3;color:#666}
 table.mcal td.k-satopen{background:#dbe9ff;color:#1d4f9a}
+table.mcal td.k-sathome{background:#f6efdc;color:#7a5f1e}
+select.satsel{margin-top:8px;font-size:16px;padding:5px 6px;font-family:inherit;border:1px solid #aab;border-radius:5px;width:100%;max-width:130px}
 table.mcal td.k-closed{background:#e4e4e4;color:#666}
 table.mcal label.ck{display:flex;align-items:center;gap:6px;margin-top:8px;cursor:pointer;font-size:15px;color:#222}
 table.mcal label.ck input{width:22px;height:22px}
 .cal td.d.closedday{background:#ddd;color:#999}
 /* 全体シフト／個別カレンダーの切り替え */
-.viewtabs{display:flex;gap:0;margin:0 0 14px}
+.viewtabs{display:flex;gap:0;margin:0 0 14px;flex-wrap:wrap}
 .viewtabs button{border-radius:0;font-size:17px;padding:12px 26px;font-weight:bold}
 .viewtabs button:first-child{border-radius:8px 0 0 8px}
 .viewtabs button:last-child{border-radius:0 8px 8px 0;border-left:none}
@@ -137,6 +140,25 @@ table.mcal label.ck input{width:22px;height:22px}
 #pcUser{font-size:20px;padding:8px 12px;font-family:inherit;min-width:10em;border:1px solid #aab;border-radius:6px}
 .pc-wrap{overflow-x:auto}
 #pcCanvas{width:100%;max-width:1120px;min-width:560px;border:1px solid var(--line);cursor:pointer;display:block}
+/* 土曜日在宅日のお知らせ */
+.hn-steps section{border-bottom:1px solid var(--line);padding:12px 0 16px}
+.hn-steps section:last-child{border-bottom:none}
+.hn-steps h3{font-size:18px;margin:0 0 10px;color:var(--text);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.hn-no{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:var(--blue);color:#fff;font-size:16px}
+#hnYm{font-size:18px;padding:6px 8px;font-family:inherit}
+.hn-sat{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:6px 0}
+.hn-d{font-size:18px;font-weight:bold;min-width:6.5em}
+.hn-sat.hol .hn-d{color:var(--bad)}
+.hn-seg{display:inline-flex}
+.hn-seg button{border-radius:0;padding:8px 16px;font-size:16px;border-color:#aab;color:#444}
+.hn-seg button:first-child{border-radius:6px 0 0 6px}
+.hn-seg button:last-child{border-radius:0 6px 6px 0}
+.hn-seg button+button{border-left:none}
+.hn-seg button.on.m-off{background:#666;color:#fff;border-color:#666}
+.hn-seg button.on.m-open{background:var(--blue);color:#fff;border-color:var(--blue)}
+.hn-seg button.on.m-home{background:#b08d3c;color:#fff;border-color:#b08d3c}
+.hn-preview{max-width:900px}
+#hnCanvas{width:100%;display:block;box-shadow:0 1px 6px rgba(0,0,0,.18);border:1px solid #ddd}
 /* 選択チェック */
 input.sel{width:22px;height:22px;vertical-align:middle;cursor:pointer}
 .selbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:12px 0}
@@ -197,6 +219,7 @@ input.sel{width:22px;height:22px;vertical-align:middle;cursor:pointer}
         <button class="primary big" id="btnAuto">自動シフト作成</button>
         <button class="primary big" id="btnPng">PNG画像を出力</button>
         <button class="big" id="btnCal2">通所日の設定</button>
+        <button class="big" id="btnHome2">土曜日在宅日のお知らせ</button>
         <button class="big" id="btnUsers2">利用者管理</button>
         <button class="small danger" id="btnClearMonth">この月のシフトを消去</button>
       </div>
@@ -206,6 +229,7 @@ input.sel{width:22px;height:22px;vertical-align:middle;cursor:pointer}
     <div class="viewtabs">
       <button data-view="all" class="active">全体シフト</button>
       <button data-view="person">個別カレンダー</button>
+      <button data-view="home">土曜日在宅日のお知らせ</button>
     </div>
 
     <div id="viewPerson" class="panel hidden">
@@ -219,6 +243,39 @@ input.sel{width:22px;height:22px;vertical-align:middle;cursor:pointer}
       <div class="pc-wrap"><canvas id="pcCanvas"></canvas></div>
     </div>
 
+    <div id="viewHome" class="panel hidden">
+      <div class="hn-steps">
+        <section>
+          <h3><span class="hn-no">1</span>年月を選ぶ</h3>
+          <div class="actions">
+            <button class="small" id="hnPrev">‹ 前月</button>
+            <input type="month" id="hnYm">
+            <button class="small" id="hnNext">翌月 ›</button>
+          </div>
+        </section>
+        <section>
+          <h3><span class="hn-no">2</span>在宅日にする土曜日を選ぶ <span class="hint" id="hnCount"></span></h3>
+          <div id="hnSats"></div>
+          <p class="hint" style="margin:6px 0 0">この設定は「通所日の設定」・シフトと共通です。通所日にした土曜日だけシフトが入ります。</p>
+        </section>
+        <section>
+          <h3><span class="hn-no">3</span>プレビューを確認する</h3>
+          <div class="hn-preview"><canvas id="hnCanvas"></canvas></div>
+          <details id="hnEdit" style="margin-top:10px"><summary style="cursor:pointer;font-weight:bold;color:var(--blue)">文字を手入力で直す</summary>
+            <div class="field" style="margin-top:10px"><label>タイトル</label><input type="text" id="hnTitle" maxlength="60" style="width:100%;max-width:520px;font-size:17px;padding:8px;font-family:inherit"></div>
+            <div class="field"><label>日付（1行に1つ）</label><textarea id="hnText" rows="6" style="width:100%;max-width:520px;font-size:17px;padding:8px;font-family:inherit"></textarea></div>
+          </details>
+          <div id="hnManual" class="notice hidden">手入力で直した内容を表示しています（土曜日の設定とは連動していません）。在宅日の設定を変えると、自動の内容に戻ります。
+            <div class="actions" style="margin-top:6px"><button class="small" id="hnReset">自動の内容に戻す</button></div></div>
+        </section>
+        <section>
+          <h3><span class="hn-no">4</span>PNG画像として保存する</h3>
+          <button class="primary big" id="hnSave">PNG画像を保存</button>
+          <p class="hint" id="hnFname"></p>
+        </section>
+      </div>
+    </div>
+
     <div id="viewAll">
     <div class="panel">
       <div id="monthNotice"></div>
@@ -226,6 +283,7 @@ input.sel{width:22px;height:22px;vertical-align:middle;cursor:pointer}
         <span><i style="background:var(--on)"></i>○ 通所</span>
         <span><i style="background:var(--ng)"></i>－ 本人の通所不可（曜日・日付）</span>
         <span><i style="background:#d9d9d9"></i>事業所の休み（日曜・祝日・指定外の土曜）</span>
+        <span><i style="background:#efe3c2"></i>土曜在宅日（見出しに「在」）</span>
         <span><i style="box-shadow:inset 0 0 0 2px #e39b00"></i>手動で修正したセル</span>
         <span><i style="background-image:linear-gradient(225deg,#2f9e6a 7px,transparent 7px)"></i>備考あり（マウスを乗せると表示）</span>
         <span><i style="background:var(--near)"></i>定員まで残りわずか</span>
@@ -249,10 +307,11 @@ input.sel{width:22px;height:22px;vertical-align:middle;cursor:pointer}
       <h2 id="calTitle">通所日の設定</h2>
       <p class="hint" style="margin-top:0" id="calIntro"></p>
       <p class="hint" style="margin-top:0">
-        <b>土曜日は「通所日にする」にチェックした日だけ</b>通所日になります。平日を臨時で休みにする場合は「休業日にする」にチェックします。<br>
+        <b>土曜日は日付ごとに「休み／通所日／在宅日」を選びます。</b>通所日にした土曜日だけシフトが入ります。在宅日は「土曜日在宅日のお知らせ」に載ります。平日を臨時で休みにする場合は「休業日にする」にチェックします。<br>
         この設定は<b>月ごと</b>で、翌月には引き継がれません。</p>
       <div class="actions" style="margin-bottom:10px">
         <button class="small" id="btnSatAll">土曜日をすべて通所日にする</button>
+        <button class="small" id="btnSatHome">土曜日をすべて在宅日にする</button>
         <button class="small" id="btnSatNone">土曜日をすべて休みにする</button>
       </div>
       <div id="calSummary" class="summary" style="margin:0 0 10px"></div>
@@ -495,13 +554,32 @@ function holidaysOf(y){
 const holidayName = (ym,d)=>{ const [y,m]=ymParts(ym); return holidaysOf(y)[`${m}-${d}`] || ''; };
 
 /* 事業所としてその日が通所日かどうか */
-function calOf(ym){ return state.cal[ym] || {sat:[], closed:[]}; }
+function calOf(ym){ return state.cal[ym] || {sat:[], closed:[], home:[]}; }
+// 土曜日の扱い：'open'＝通所日／'home'＝在宅日／'off'＝休み（1つの設定をシフトとお知らせの両方で使う）
+function satMode(ym, d){ const c = calOf(ym); return (c.sat||[]).includes(d) ? 'open' : (c.home||[]).includes(d) ? 'home' : 'off'; }
+function setSatMode(ym, d, mode){
+  const c = state.cal[ym] || (state.cal[ym] = {sat:[], closed:[], home:[]});
+  c.home = c.home || [];
+  const before = noticeLinesAuto(ym).join('\n');
+  c.sat  = c.sat.filter(x=>x!==d);
+  c.home = c.home.filter(x=>x!==d);
+  if(mode==='open') c.sat.push(d);
+  if(mode==='home') c.home.push(d);
+  c.sat.sort((a,b)=>a-b); c.home.sort((a,b)=>a-b);
+  // 在宅日が変わったら、お知らせの手入力内容は破棄して自動の内容に戻す（食い違い防止）
+  let reset = false;
+  if(c.notice && noticeLinesAuto(ym).join('\n') !== before){ delete c.notice; reset = true; }
+  save();
+  return reset;
+}
 function dayInfo(ym,d){
   const w = weekday(ym,d), hol = holidayName(ym,d), c = calOf(ym);
   if(hol)   return {open:false, kind:'hol', label:hol};
   if(w===0) return {open:false, kind:'sun', label:'日曜（休み）'};
   if(w!==6 && (state.closedWeekdays||[]).includes(w)) return {open:false, kind:'wclosed', label:`${WD[w]}曜（休業日）`};
-  if(w===6) return (c.sat||[]).includes(d) ? {open:true, kind:'satopen', label:'土曜通所日'} : {open:false, kind:'satoff', label:'土曜（休み）'};
+  if(w===6) return (c.sat||[]).includes(d) ? {open:true, kind:'satopen', label:'土曜通所日'}
+                 : (c.home||[]).includes(d) ? {open:false, kind:'sathome', label:'土曜（在宅日）'}
+                 : {open:false, kind:'satoff', label:'土曜（休み）'};
   if((c.closed||[]).includes(d)) return {open:false, kind:'closed', label:'休業日'};
   return {open:true, kind:'wd', label:''};
 }
@@ -687,7 +765,9 @@ function validateData(input){
     for(const ym in data.cal){
       const c = data.cal[ym];
       if(!YM.test(ym) || !c || typeof c!=='object') return fail(`通所日の設定「${ym}」が正しくありません`);
-      if((c.sat && !(Array.isArray(c.sat) && c.sat.every(d=>isInt(d,1,31)))) || (c.closed && !(Array.isArray(c.closed) && c.closed.every(d=>isInt(d,1,31))))) return fail(`通所日の設定「${ym}」の日付が正しくありません`);
+      const okDays = a => a===undefined || (Array.isArray(a) && a.every(d=>isInt(d,1,31)));
+      if(!okDays(c.sat) || !okDays(c.closed) || !okDays(c.home)) return fail(`通所日の設定「${ym}」の日付が正しくありません`);
+      if(c.notice!==undefined && !(c.notice && typeof c.notice.title==='string' && typeof c.notice.text==='string' && c.notice.title.length<=200 && c.notice.text.length<=2000)) return fail(`${ym}の在宅日のお知らせの内容が正しくありません`);
     }
   }
   if(data.capacity!==undefined && !isInt(data.capacity,1,200)) return fail('1日の定員が正しくありません');
@@ -802,7 +882,10 @@ function normalize(){
     const m = state.months[ym];
     m.assign = m.assign || {}; m.manual = m.manual || {}; m.names = m.names || {}; m.notes = m.notes || {};
   }
-  for(const ym in state.cal){ const c=state.cal[ym]; c.sat=c.sat||[]; c.closed=c.closed||[]; }
+  for(const ym in state.cal){
+    const c=state.cal[ym]; c.sat=c.sat||[]; c.closed=c.closed||[]; c.home=(c.home||[]).filter(d=>!c.sat.includes(d));
+    if(c.notice && (typeof c.notice.title!=='string' || typeof c.notice.text!=='string')) delete c.notice;
+  }
   state.selected = (state.selected||[]).filter(id=>state.users.some(u=>u.id===id));
   state.version = 4;
 }
@@ -1132,8 +1215,10 @@ function render(){
     document.querySelectorAll('.viewtabs button').forEach(b=>b.classList.toggle('active', b.dataset.view===shiftView));
     document.getElementById('viewAll').classList.toggle('hidden', shiftView!=='all');
     document.getElementById('viewPerson').classList.toggle('hidden', shiftView!=='person');
+    document.getElementById('viewHome').classList.toggle('hidden', shiftView!=='home');
     renderShift();
     if(shiftView==='person') renderPerson();
+    if(shiftView==='home') renderHomeNotice();
   }
   if(currentTab==='cal') renderCal();
   if(currentTab==='users') renderUsers();
@@ -1167,11 +1252,11 @@ function renderShift(){
   document.getElementById('monthNotice').innerHTML = notice;
 
   const info = []; for(let d=1; d<=D; d++) info[d] = dayInfo(ym,d);
-  const cls = d => { const w=weekday(ym,d); return (w===0?'sun':w===6?'sat':'') + (info[d].open?'':' closed') + (info[d].kind==='hol'?' hol':''); };
+  const cls = d => { const w=weekday(ym,d); return (w===0?'sun':w===6?'sat':'') + (info[d].open?'':' closed') + (info[d].kind==='hol'?' hol':'') + (info[d].kind==='sathome'?' home':''); };
   let h = '<thead><tr><th class="name" rowspan="2">名字</th>';
   for(let d=1; d<=D; d++) h += `<th class="${cls(d)}" title="${esc(info[d].label)}">${d}</th>`;
   h += '<th rowspan="2">予定</th><th rowspan="2">目標</th><th rowspan="2">差</th></tr><tr>';
-  for(let d=1; d<=D; d++) h += `<th class="${cls(d)}" title="${esc(info[d].label)}">${info[d].kind==='hol'?'祝':WD[weekday(ym,d)]}</th>`;
+  for(let d=1; d<=D; d++) h += `<th class="${cls(d)}" title="${esc(info[d].label)}">${info[d].kind==='hol'?'祝':info[d].kind==='sathome'?'在':WD[weekday(ym,d)]}</th>`;
   h += '</tr></thead><tbody>';
   if(!A.rows.length) h += `<tr><td class="name" colspan="${D+4}" style="padding:16px">利用者が登録されていません。「利用者管理」から追加してください。</td></tr>`;
   for(const r of A.rows){
@@ -1293,7 +1378,7 @@ function renderCal(){
     const info = dayInfo(ym,d), w = weekday(ym,d);
     let body = `<div class="dn">${d}</div><div class="lb">${esc(info.label || '通所日')}</div>`;
     if(info.kind==='hol' || info.kind==='wclosed'){ /* 祝日・休業曜日は休み固定 */ }
-    else if(w===6) body += `<label class="ck"><input type="checkbox" data-sat="${d}" ${info.open?'checked':''}>通所日にする</label>`;
+    else if(w===6) body += `<select class="satsel" data-satmode="${d}">${[['off','休み'],['open','通所日'],['home','在宅日']].map(([v,t])=>`<option value="${v}" ${satMode(ym,d)===v?'selected':''}>${t}</option>`).join('')}</select>`;
     else if(w!==0) body += `<label class="ck"><input type="checkbox" data-closed="${d}" ${info.kind==='closed'?'checked':''}>休業日にする</label>`;
     h += `<td class="k-${info.kind}">${body}</td>`;
     if((offset+d)%7===0 && d<D) h += '</tr><tr>';
@@ -1685,6 +1770,7 @@ function buildCalendarCanvases(ym, mode){
         if(inf.kind==='hol'){ lab = inf.label; labColor = '#c0392b'; }
         else if(inf.kind==='satopen'){ lab = '土曜通所日'; labColor = '#2456a6'; }
         else if(inf.kind==='closed'){ lab = '休業日'; }
+        else if(inf.kind==='sathome'){ lab = '在宅日'; labColor = '#8a6a1f'; }
         if(lab) text(lab, x+10, yy+50, {size:15, bold:true, color:labColor});
         if(inf.open){
           // 人数（全体は定員と比較、選択は対象者の人数＋全体人数）
@@ -1702,7 +1788,7 @@ function buildCalendarCanvases(ym, mode){
             text(n, x + 10 + col*nameW, yy + headH + row*lineH + lineH/2, {size:fs, bold:true, color:'#1d1d1d'});
           });
         }else{
-          text('休み', x+cellW/2, yy+headH + (rh-headH)/2 - 4, {size:26, bold:true, align:'center', color: red?'#d77':'#999'});
+          text(inf.kind==='sathome'?'在宅':'休み', x+cellW/2, yy+headH + (rh-headH)/2 - 4, {size:26, bold:true, align:'center', color: inf.kind==='sathome'?'#a88433':red?'#d77':'#999'});
         }
       });
       line(pad, yy, pad+cellW*7, yy, '#8a9bb0', 1.5);
@@ -1776,6 +1862,7 @@ function drawPersonCalendar(cv, ym, uid){
     if(!inMonth) color = col>=5 ? 'rgba(255,255,255,.6)' : '#c4ccd4';     // 前月・翌月は薄く
     else if(holidayName(ym,d)) color = '#d0302a';                          // 祝日は赤字（〇は付けない）
     text(label, x+cw-10, yy+16, {size:17, align:'right', color});
+    if(inMonth && satMode(ym,d)==='home' && !holidayName(ym,d)) text('在宅', x+10, yy+16, {size:15, bold:true, color:'#1a1a1a'});
     const note = inMonth ? noteOf(ym, uid, d) : '';
     const on = inMonth && days.has(d) && isOpen(ym,d);
     const cy = yy + PC.cellH/2 + 12;
@@ -1872,6 +1959,117 @@ async function exportPersonPNGs(ids){
   }
   toast(`${ids.length}人分の個別カレンダーを保存しました（ダウンロードフォルダ）`);
   return true;
+}
+
+/* =========================================================
+   土曜日在宅日のお知らせ（A4横・PNG）
+   日付は「通所日の設定」の在宅日（state.cal[ym].home）から自動で作る
+   ========================================================= */
+const HN = {W:1754, H:1240, S:2};   // A4横（297×210mm）。保存は 3508×2480px（300dpi相当）
+const HN_GOLD = '#b08d3c', HN_GOLD_L = '#d9c38c', HN_TEXT = '#2b2b2b';
+const HN_FONT = '"Yu Gothic","YuGothic","Hiragino Kaku Gothic ProN","Meiryo","Noto Sans JP",sans-serif';
+const noticeTitleAuto = ym => { const [y,mo] = ymParts(ym); return `${y}年${mo}月 土曜日在宅日`; };
+const homeDays = ym => (calOf(ym).home||[]).filter(d=>weekday(ym,d)===6 && !holidayName(ym,d)).sort((a,b)=>a-b);
+const noticeLinesAuto = ym => homeDays(ym).map(d=>`${d}日（土）`);
+// お知らせの内容（手入力で直していれば、その内容）
+function noticeContent(ym){
+  const ov = calOf(ym).notice;
+  if(ov) return {title: ov.title, lines: String(ov.text||'').split('\n').map(s=>s.trim()).filter(Boolean), manual:true};
+  return {title: noticeTitleAuto(ym), lines: noticeLinesAuto(ym), manual:false};
+}
+function drawHomeNotice(cv, ym){
+  const {W,H,S} = HN, {title, lines} = noticeContent(ym);
+  cv.width = W*S; cv.height = H*S;
+  const g = cv.getContext('2d'); g.setTransform(S,0,0,S,0,0);
+  g.fillStyle = '#fff'; g.fillRect(0,0,W,H);
+  // 控えめな枠（金色の細い二重線）
+  g.strokeStyle = HN_GOLD; g.lineWidth = 3; g.strokeRect(46,46,W-92,H-92);
+  g.strokeStyle = HN_GOLD_L; g.lineWidth = 1.2; g.strokeRect(60,60,W-120,H-120);
+  g.textAlign = 'center'; g.textBaseline = 'middle';
+  const fit = (str, weight, size, maxW) => { g.font = `${weight} ${size}px ${HN_FONT}`; const w = g.measureText(str).width; return w > maxW ? Math.floor(size*maxW/w) : size; };
+  // タイトル（上部中央）
+  const tSize = fit(title, 700, 96, W-300);
+  g.font = `700 ${tSize}px ${HN_FONT}`; g.fillStyle = HN_TEXT;
+  g.fillText(title, W/2, 220);
+  // タイトル下の金色の線
+  g.strokeStyle = HN_GOLD; g.lineWidth = 3;
+  g.beginPath(); g.moveTo(W/2-170, 300); g.lineTo(W/2+170, 300); g.stroke();
+  // 日付（中央に大きく）
+  const top = 350, bottom = H-130, areaH = bottom-top, areaW = W-320;
+  if(!lines.length){
+    const s = fit('今月の在宅日はありません', 500, 96, areaW);
+    g.font = `500 ${s}px ${HN_FONT}`; g.fillStyle = '#555';
+    g.fillText('今月の在宅日はありません', W/2, top + areaH/2);
+    return;
+  }
+  // 行数が多いときは列を増やし、いちばん大きく書ける並べ方を選ぶ（重ならず枠内に収まる）
+  let best = null;
+  for(let cols=1; cols<=4; cols++){
+    const rows = Math.ceil(lines.length/cols);
+    if(cols>1 && rows*(cols-1) >= lines.length) continue;
+    const colW = areaW/cols;
+    let size = Math.min(160, Math.floor(areaH/(rows*1.4)));
+    g.font = `700 ${size}px ${HN_FONT}`;
+    const widest = Math.max(...lines.map(l=>g.measureText(l).width));
+    if(widest > colW*0.92) size = Math.floor(size * colW*0.92 / widest);
+    if(!best || size > best.size) best = {cols, rows, size, colW};
+  }
+  const {cols, rows, size, colW} = best;
+  const lh = size*1.4, blockH = rows*lh, y0 = top + (areaH-blockH)/2 + lh/2;
+  lines.forEach((ln,i)=>{
+    const c = Math.floor(i/rows), r = i%rows;
+    const cx = W/2 - areaW/2 + colW*(c+0.5), cy = y0 + r*lh;
+    // 「14日（土）」の（土）だけを金色にする
+    const m = ln.match(/^(.*?)([（(][土日月火水木金][)）])$/);
+    g.font = `700 ${size}px ${HN_FONT}`;
+    if(m){
+      const w1 = g.measureText(m[1]).width, w2 = g.measureText(m[2]).width, x = cx - (w1+w2)/2;
+      g.textAlign = 'left'; g.fillStyle = HN_TEXT; g.fillText(m[1], x, cy);
+      g.fillStyle = HN_GOLD; g.fillText(m[2], x+w1, cy);
+      g.textAlign = 'center';
+    }else{
+      g.fillStyle = HN_TEXT; g.fillText(ln, cx, cy);
+    }
+  });
+}
+function renderHomeNotice(){
+  const ym = state.currentYM, D = daysIn(ym);
+  const f = id => document.getElementById(id);
+  f('hnYm').value = ym;
+  // ② 土曜日の選択
+  let h = '';
+  for(let d=1; d<=D; d++){
+    if(weekday(ym,d)!==6) continue;
+    const hol = holidayName(ym,d), mode = satMode(ym,d);
+    h += `<div class="hn-sat ${hol?'hol':''}"><div class="hn-d">${d}日（土）${hol?`<span class="hint">　${esc(hol)}のため休み</span>`:''}</div>`;
+    if(!hol) h += `<div class="hn-seg">${[['off','休み'],['open','通所日'],['home','在宅日']].map(([v,t])=>
+      `<button data-hsat="${d}" data-mode="${v}" class="${mode===v?'on m-'+v:''}">${t}</button>`).join('')}</div>`;
+    h += '</div>';
+  }
+  f('hnSats').innerHTML = h || '<p class="hint">この月に土曜日はありません。</p>';
+  // ③ 内容（手入力で直せる）
+  const c = noticeContent(ym);
+  if(document.activeElement !== f('hnTitle')) f('hnTitle').value = c.title;
+  if(document.activeElement !== f('hnText'))  f('hnText').value  = c.lines.join('\n');
+  f('hnManual').classList.toggle('hidden', !c.manual);
+  f('hnCount').textContent = `在宅日：${homeDays(ym).length}日`;
+  drawHomeNotice(f('hnCanvas'), ym);
+  const [y,mo] = ymParts(ym);
+  f('hnFname').textContent = `保存するファイル名：${y}年${mo}月_土曜日在宅日のお知らせ.png`;
+}
+function setNoticeOverride(ym, title, text){
+  const c = state.cal[ym] || (state.cal[ym] = {sat:[], closed:[], home:[]});
+  const autoT = noticeTitleAuto(ym), autoX = noticeLinesAuto(ym).join('\n');
+  const norm = s => String(s).split('\n').map(x=>x.trim()).filter(Boolean).join('\n');
+  if(title.trim()===autoT && norm(text)===autoX) delete c.notice;          // 自動と同じなら手入力扱いにしない
+  else c.notice = {title: title.trim() || autoT, text: norm(text)};
+  save();
+}
+function saveHomeNoticePNG(){
+  const ym = state.currentYM, [y,mo] = ymParts(ym);
+  const cv = document.createElement('canvas'); drawHomeNotice(cv, ym);
+  const fname = `${y}年${mo}月_土曜日在宅日のお知らせ.png`;
+  saveCanvas(cv, fname).then(()=>toast(`「${fname}」を保存しました（ダウンロードフォルダ）`));
 }
 
 /* =========================================================
@@ -2056,21 +2254,34 @@ document.getElementById('dmClose').onclick = ()=>{ closeDayModal(); renderPerson
 document.getElementById('dayModal').onclick = e=>{ if(e.target.id==='dayModal'){ closeDayModal(); renderPerson(); } };
 document.getElementById('dmNote').onkeydown = e=>{ if(e.key==='Enter') document.getElementById('dmSave').click(); };
 
+// 土曜日在宅日のお知らせ
+document.getElementById('btnHome2').onclick = ()=>{ shiftView='home'; render(); };
+document.getElementById('hnPrev').onclick = ()=>{ state.currentYM = addMonth(state.currentYM,-1); save(); render(); };
+document.getElementById('hnNext').onclick = ()=>{ state.currentYM = addMonth(state.currentYM,1); save(); render(); };
+document.getElementById('hnYm').onchange = e=>{ if(e.target.value){ state.currentYM = e.target.value; save(); render(); } };
+document.getElementById('hnSats').onclick = e=>{
+  const b = e.target.closest('button[data-hsat]'); if(!b) return;
+  if(setSatMode(state.currentYM, Number(b.dataset.hsat), b.dataset.mode)) toast('在宅日が変わったため、お知らせを自動の内容に戻しました');
+  render();
+};
+const hnInput = ()=>{ setNoticeOverride(state.currentYM, document.getElementById('hnTitle').value, document.getElementById('hnText').value); renderHomeNotice(); };
+document.getElementById('hnTitle').oninput = hnInput;
+document.getElementById('hnText').oninput = hnInput;
+document.getElementById('hnReset').onclick = ()=>{ const c = state.cal[state.currentYM]; if(c){ delete c.notice; save(); } document.getElementById('hnTitle').blur(); document.getElementById('hnText').blur(); renderHomeNotice(); toast('自動の内容に戻しました'); };
+document.getElementById('hnSave').onclick = saveHomeNoticePNG;
+
 // 通所日の設定
 document.getElementById('mcal').onchange = e=>{
   const t = e.target, ym = state.currentYM;
-  if(t.dataset.sat) setCal(ym, 'sat', Number(t.dataset.sat), t.checked);
+  if(t.dataset.satmode){ if(setSatMode(ym, Number(t.dataset.satmode), t.value)) toast('在宅日が変わったため、お知らせを自動の内容に戻しました'); renderCal(); }
   if(t.dataset.closed) setCal(ym, 'closed', Number(t.dataset.closed), t.checked);
 };
-document.getElementById('btnSatAll').onclick = ()=>{
-  const ym = state.currentYM, c = state.cal[ym] || (state.cal[ym] = {sat:[], closed:[]});
-  c.sat = []; for(let d=1; d<=daysIn(ym); d++) if(weekday(ym,d)===6 && !holidayName(ym,d)) c.sat.push(d);
-  save(); renderCal();
-};
-document.getElementById('btnSatNone').onclick = ()=>{
-  const ym = state.currentYM, c = state.cal[ym] || (state.cal[ym] = {sat:[], closed:[]});
-  c.sat = []; save(); renderCal();
-};
+const setAllSat = mode => { const ym = state.currentYM; let reset = false;
+  for(let d=1; d<=daysIn(ym); d++) if(weekday(ym,d)===6 && !holidayName(ym,d)) reset = setSatMode(ym, d, mode) || reset;
+  if(reset) toast('在宅日が変わったため、お知らせを自動の内容に戻しました'); render(); };
+document.getElementById('btnSatAll').onclick  = ()=>setAllSat('open');
+document.getElementById('btnSatHome').onclick = ()=>setAllSat('home');
+document.getElementById('btnSatNone').onclick = ()=>setAllSat('off');
 
 // 利用者の選択（画像出力用。シフトには影響しない）
 document.getElementById('userTable').onchange = e=>{
