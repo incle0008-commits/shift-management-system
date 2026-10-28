@@ -1,0 +1,2210 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>通所シフト管理（B型事業所）</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="通所シフト">
+<meta name="theme-color" content="#2f5d8a">
+<style>
+:root{
+  --blue:#2f5d8a; --blue-d:#234a70; --blue-l:#e8f0f8;
+  --line:#c9d3de; --text:#222; --muted:#666;
+  --sat:#e3eeff; --sun:#ffe8e8; --near:#fff1bf; --full:#ffcccc;
+  --on:#cfe3f7; --ng:#e9e9e9; --bad:#c0392b; --ok:#1e7d3a;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Meiryo","Yu Gothic UI","Yu Gothic","Hiragino Sans",sans-serif;font-size:16px;color:var(--text);background:#f4f6f9}
+header{background:#fff;border-bottom:3px solid var(--blue);padding:10px 16px;display:flex;flex-wrap:wrap;align-items:center;gap:10px 20px}
+header h1{font-size:17px;margin:0;color:var(--blue)}
+.ym{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ym .label{font-size:26px;font-weight:bold;min-width:7.5em;text-align:center}
+.ym input{font-size:15px;padding:6px;font-family:inherit}
+button{font-family:inherit;font-size:16px;padding:10px 18px;border:1px solid var(--blue);background:#fff;color:var(--blue);border-radius:6px;cursor:pointer}
+button:hover{background:var(--blue-l)}
+button.primary{background:var(--blue);color:#fff}
+button.primary:hover{background:var(--blue-d)}
+button.big{font-size:18px;padding:14px 24px;font-weight:bold}
+button.danger{border-color:var(--bad);color:var(--bad)}
+button.danger:hover{background:#fdecea}
+button.small{padding:6px 12px;font-size:14px}
+nav.tabs{display:flex;gap:2px;padding:0 12px;background:#fff;border-bottom:1px solid var(--line);overflow-x:auto}
+nav.tabs button{border:none;border-bottom:4px solid transparent;border-radius:0;padding:12px 18px;color:#444;white-space:nowrap;font-size:17px}
+nav.tabs button.active{border-bottom-color:var(--blue);color:var(--blue);font-weight:bold;background:#fff}
+main{padding:14px;max-width:1700px;margin:0 auto}
+.panel{background:#fff;border:1px solid var(--line);border-radius:8px;padding:16px;margin-bottom:14px}
+.panel h2{font-size:18px;margin:0 0 12px;color:var(--blue)}
+.actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.summary{display:flex;flex-wrap:wrap;gap:6px 22px;margin-top:12px}
+.summary b{font-size:19px;color:var(--blue)}
+.hint{color:var(--muted);font-size:14px}
+.notice{background:var(--blue-l);border-left:4px solid var(--blue);padding:10px 14px;margin:10px 0;border-radius:4px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:14px;margin:8px 0;color:#444}
+.legend span i{display:inline-block;width:16px;height:16px;vertical-align:-3px;margin-right:4px;border:1px solid var(--line)}
+.table-wrap{overflow:auto;max-height:72vh;border:1px solid var(--line);background:#fff}
+table.shift{border-collapse:separate;border-spacing:0;font-size:14px}
+table.shift th,table.shift td{border-right:1px solid var(--line);border-bottom:1px solid var(--line);text-align:center;padding:0;min-width:31px;height:32px;background:#fff}
+table.shift .name{position:sticky;left:0;z-index:2;min-width:96px;text-align:left;padding:0 8px;font-weight:bold;white-space:nowrap;border-right:2px solid #9fb0c2}
+table.shift thead th{position:sticky;z-index:3;background:#eef2f7;font-weight:bold}
+table.shift thead tr:first-child th{top:0;height:28px}
+table.shift thead tr:nth-child(2) th{top:28px;height:24px;font-size:13px}
+table.shift thead th.name{z-index:5}
+table.shift th.sat{background:var(--sat)} table.shift th.sun{background:var(--sun)}
+table.shift td.c{cursor:pointer;font-size:17px;user-select:none}
+table.shift td.c.sat{background:#f4f8ff} table.shift td.c.sun{background:#fff5f5}
+table.shift td.c:hover{outline:2px solid var(--blue);outline-offset:-2px}
+table.shift td.c.on{background:var(--on);color:var(--blue-d);font-weight:bold}
+table.shift td.c.ng{background:var(--ng);color:#aaa;font-size:12px}
+table.shift td.c.manual{box-shadow:inset 0 0 0 2px #e39b00}
+table.shift td.c.hasnote{background-image:linear-gradient(225deg,#2f9e6a 7px,transparent 7px)}
+table.shift td.sum{min-width:52px;padding:0 4px;font-weight:bold;background:#f7f9fb}
+table.shift td.minus{color:var(--bad)}
+table.shift tfoot td{position:sticky;background:#eef2f7;font-weight:bold;z-index:1}
+table.shift tfoot tr:first-child td{bottom:32px}
+table.shift tfoot tr:last-child td{bottom:0}
+table.shift tfoot td.name{z-index:4}
+table.shift tfoot td.near{background:var(--near)}
+table.shift tfoot td.full{background:var(--full);color:var(--bad)}
+table.shift tfoot td.under{background:#ffe3c2;color:#a04f00}
+tr.inactive td.name{color:#999}
+.result-ok{color:var(--ok);font-weight:bold}
+.result-ng{color:var(--bad);font-weight:bold}
+table.list{border-collapse:collapse;width:100%;font-size:15px}
+table.list th,table.list td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:middle}
+table.list th{background:#eef2f7}
+table.list td.num{text-align:right}
+.list-wrap{overflow-x:auto}
+.badge{display:inline-block;padding:2px 10px;border-radius:10px;font-size:13px}
+.badge.on{background:#dff3e4;color:var(--ok)} .badge.off{background:#eee;color:#777}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:flex-start;justify-content:center;z-index:100;overflow:auto;padding:20px 10px}
+.modal-bg.show{display:flex}
+.modal{background:#fff;border-radius:10px;padding:20px;width:100%;max-width:560px}
+.modal h3{margin:0 0 14px;color:var(--blue);font-size:20px}
+.field{margin-bottom:16px}
+.field > label{display:block;font-weight:bold;margin-bottom:6px}
+.field input[type=text],.field input[type=number]{font-size:18px;padding:8px 10px;width:100%;max-width:260px;font-family:inherit;border:1px solid #aab;border-radius:5px}
+.wdsel{display:flex;flex-wrap:wrap;gap:6px}
+.wdsel label{border:1px solid #aab;border-radius:6px;padding:8px 12px;cursor:pointer;font-size:17px;user-select:none}
+.wdsel input{display:none}
+.wdsel label.checked{background:#fbe3e3;border-color:var(--bad);color:var(--bad);font-weight:bold}
+.cal{border-collapse:collapse;margin-top:6px}
+.cal th,.cal td{width:42px;height:36px;text-align:center;border:1px solid var(--line);font-size:15px}
+.cal td.d{cursor:pointer}
+.cal td.d:hover{background:var(--blue-l)}
+.cal td.d.wdng{background:var(--ng);color:#999}
+.cal td.d.sel{background:var(--bad);color:#fff;font-weight:bold}
+.cal th.sun{color:var(--bad)} .cal th.sat{color:var(--blue)}
+.calnav{display:flex;align-items:center;gap:10px;margin-top:4px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chip{background:#fbe3e3;border-radius:14px;padding:3px 10px;font-size:14px}
+.chip button{border:none;background:none;color:var(--bad);padding:0 0 0 6px;font-size:14px}
+.modal .foot{display:flex;justify-content:flex-end;gap:10px;margin-top:8px}
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:12px 22px;border-radius:8px;display:none;z-index:200;font-size:16px}
+.hidden{display:none!important}
+.sync-badge{padding:6px 12px;font-size:14px;border-radius:16px;border:1px solid #bbb;color:#666;background:#f6f6f6;margin-left:auto;order:3}
+.sync-badge.s-ok{border-color:#9bd1ae;color:#1e7d3a;background:#eaf7ee}
+.sync-badge.s-busy,.sync-badge.s-wait{border-color:#a9c3e0;color:var(--blue);background:var(--blue-l)}
+.sync-badge.s-err,.sync-badge.s-offline{border-color:#e6a1a1;color:var(--bad);background:#fdecea}
+#syncPanel .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px 16px;margin:10px 0}
+#syncPanel label{display:block;font-weight:bold;font-size:15px;margin-bottom:4px}
+#syncPanel input,#syncPanel textarea{font-size:16px;padding:8px 10px;width:100%;font-family:inherit;border:1px solid #aab;border-radius:5px}
+#syncPanel textarea{height:70px;font-family:monospace;font-size:13px;word-break:break-all}
+#syncState{background:#f7f9fb;border:1px solid var(--line);border-radius:6px;padding:10px 12px;margin-bottom:10px}
+/* 休業日（日曜・祝日・未指定の土曜・休業日） */
+table.shift th.closed{background:#dcdcdc;color:#888}
+table.shift th.hol{color:var(--bad)}
+table.shift td.c.closed{background:#d9d9d9;cursor:not-allowed}
+table.shift td.c.closed.on{background:#f4b6b6;color:var(--bad)}
+table.shift tfoot td.closed{background:#d9d9d9;color:#888}
+/* 通所日カレンダー */
+table.mcal{border-collapse:collapse;width:100%;table-layout:fixed;min-width:560px}
+table.mcal th{background:#eef2f7;padding:8px;border:1px solid var(--line);font-size:16px}
+table.mcal th.sat{background:var(--sat);color:#2456a6} table.mcal th.sun{background:var(--sun);color:var(--bad)}
+table.mcal td{border:1px solid var(--line);vertical-align:top;height:96px;padding:6px 8px;font-size:15px}
+table.mcal td .dn{font-size:22px;font-weight:bold}
+table.mcal td .lb{font-size:13px;margin-top:2px;min-height:18px}
+table.mcal td.out{background:#fafafa}
+table.mcal td.k-wd{background:#fff}
+table.mcal td.k-sun,table.mcal td.k-hol{background:#ffecec;color:var(--bad)}
+table.mcal td.k-satoff{background:#eef0f3;color:#666}
+table.mcal td.k-satopen{background:#dbe9ff;color:#1d4f9a}
+table.mcal td.k-closed{background:#e4e4e4;color:#666}
+table.mcal label.ck{display:flex;align-items:center;gap:6px;margin-top:8px;cursor:pointer;font-size:15px;color:#222}
+table.mcal label.ck input{width:22px;height:22px}
+.cal td.d.closedday{background:#ddd;color:#999}
+/* 全体シフト／個別カレンダーの切り替え */
+.viewtabs{display:flex;gap:0;margin:0 0 14px}
+.viewtabs button{border-radius:0;font-size:17px;padding:12px 26px;font-weight:bold}
+.viewtabs button:first-child{border-radius:8px 0 0 8px}
+.viewtabs button:last-child{border-radius:0 8px 8px 0;border-left:none}
+.viewtabs button.active{background:var(--blue);color:#fff}
+#pcUser{font-size:20px;padding:8px 12px;font-family:inherit;min-width:10em;border:1px solid #aab;border-radius:6px}
+.pc-wrap{overflow-x:auto}
+#pcCanvas{width:100%;max-width:1120px;min-width:560px;border:1px solid var(--line);cursor:pointer;display:block}
+/* 選択チェック */
+input.sel{width:22px;height:22px;vertical-align:middle;cursor:pointer}
+.selbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:12px 0}
+.selcount{font-size:17px;font-weight:bold;color:var(--blue)}
+/* 画像出力ダイアログ */
+.modal.wide{max-width:720px}
+.optlist label.opt{display:block;border:2px solid var(--line);border-radius:8px;padding:12px 14px;margin-bottom:10px;cursor:pointer}
+.optlist label.opt.checked{border-color:var(--blue);background:var(--blue-l)}
+.optlist label.opt input{width:20px;height:20px;vertical-align:-4px;margin-right:8px}
+.optlist label.opt b{font-size:17px}
+.optlist .desc{color:var(--muted);font-size:14px;margin:4px 0 0 30px}
+.pickgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px;max-height:260px;overflow:auto;border:1px solid var(--line);border-radius:6px;padding:8px}
+.pickgrid label{display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:5px;cursor:pointer;font-size:16px}
+.pickgrid label:hover{background:var(--blue-l)}
+.pickgrid input{width:20px;height:20px}
+@media (max-width:700px){
+  .ym .label{font-size:21px;min-width:auto}
+  button.big{font-size:16px;padding:12px 10px;width:100%}
+  main{padding:8px}
+  header{padding:8px 10px;gap:6px 10px}
+  header h1{order:0;font-size:16px}
+  .sync-badge{order:1;margin-left:auto;padding:4px 10px;font-size:13px}
+  .ym{order:2;width:100%;gap:6px}
+  .ym input{flex:1;min-width:0}
+  #tab-shift > .panel:first-child .actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  #btnClearMonth{grid-column:span 2;justify-self:start}
+  nav.tabs button{padding:10px 12px;font-size:15px}
+  .viewtabs button{padding:10px 16px;font-size:15px}
+  #viewPerson .actions{gap:6px}
+  #pcSave{width:100%}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>通所シフト管理</h1>
+  <button id="syncBadge" class="sync-badge s-off" title="同期の設定">同期オフ</button>
+  <div class="ym">
+    <button class="small" id="prevM">‹ 前月</button>
+    <span class="label" id="ymLabel"></span>
+    <button class="small" id="nextM">翌月 ›</button>
+    <input type="month" id="ymPick" title="年月を選んで移動">
+  </div>
+</header>
+
+<nav class="tabs">
+  <button data-tab="shift" class="active">シフト表</button>
+  <button data-tab="cal">通所日の設定</button>
+  <button data-tab="users">利用者管理</button>
+  <button data-tab="settings">設定・バックアップ</button>
+</nav>
+
+<main>
+  <!-- シフト表 -->
+  <section id="tab-shift">
+    <div class="panel">
+      <div class="actions">
+        <button class="primary big" id="btnAuto">自動シフト作成</button>
+        <button class="primary big" id="btnPng">PNG画像を出力</button>
+        <button class="big" id="btnCal2">通所日の設定</button>
+        <button class="big" id="btnUsers2">利用者管理</button>
+        <button class="small danger" id="btnClearMonth">この月のシフトを消去</button>
+      </div>
+      <div class="summary" id="summary"></div>
+    </div>
+
+    <div class="viewtabs">
+      <button data-view="all" class="active">全体シフト</button>
+      <button data-view="person">個別カレンダー</button>
+    </div>
+
+    <div id="viewPerson" class="panel hidden">
+      <div class="actions" style="margin-bottom:12px">
+        <button class="small" id="pcPrev" title="前の人">‹</button>
+        <select id="pcUser"></select>
+        <button class="small" id="pcNext" title="次の人">›</button>
+        <button class="primary" id="pcSave">この人のカレンダーをPNGで保存</button>
+      </div>
+      <p class="hint" style="margin:0 0 8px">日付の枠をクリックすると、「通所／休み」の切り替えと<b>備考の入力</b>ができます（全体シフトにもすぐ反映されます）。<span id="pcInfo"></span></p>
+      <div class="pc-wrap"><canvas id="pcCanvas"></canvas></div>
+    </div>
+
+    <div id="viewAll">
+    <div class="panel">
+      <div id="monthNotice"></div>
+      <div class="legend">
+        <span><i style="background:var(--on)"></i>○ 通所</span>
+        <span><i style="background:var(--ng)"></i>－ 本人の通所不可（曜日・日付）</span>
+        <span><i style="background:#d9d9d9"></i>事業所の休み（日曜・祝日・指定外の土曜）</span>
+        <span><i style="box-shadow:inset 0 0 0 2px #e39b00"></i>手動で修正したセル</span>
+        <span><i style="background-image:linear-gradient(225deg,#2f9e6a 7px,transparent 7px)"></i>備考あり（マウスを乗せると表示）</span>
+        <span><i style="background:var(--near)"></i>定員まで残りわずか</span>
+        <span><i style="background:var(--full)"></i>定員に到達</span>
+        <span><i style="background:#ffe3c2"></i>1日の目標人数に届かない日</span>
+      </div>
+      <p class="hint" style="margin:4px 0 8px">セルをクリックすると「通所／休み」を切り替えられます。人数は自動で再計算されます。</p>
+      <div class="table-wrap"><table class="shift" id="shiftTable"></table></div>
+    </div>
+
+    <div class="panel">
+      <h2>作成結果の確認</h2>
+      <div id="report"></div>
+    </div>
+    </div><!-- /viewAll -->
+  </section>
+
+  <!-- 通所日の設定 -->
+  <section id="tab-cal" class="hidden">
+    <div class="panel">
+      <h2 id="calTitle">通所日の設定</h2>
+      <p class="hint" style="margin-top:0" id="calIntro"></p>
+      <p class="hint" style="margin-top:0">
+        <b>土曜日は「通所日にする」にチェックした日だけ</b>通所日になります。平日を臨時で休みにする場合は「休業日にする」にチェックします。<br>
+        この設定は<b>月ごと</b>で、翌月には引き継がれません。</p>
+      <div class="actions" style="margin-bottom:10px">
+        <button class="small" id="btnSatAll">土曜日をすべて通所日にする</button>
+        <button class="small" id="btnSatNone">土曜日をすべて休みにする</button>
+      </div>
+      <div id="calSummary" class="summary" style="margin:0 0 10px"></div>
+      <div id="calNotice"></div>
+      <div class="list-wrap"><table class="mcal" id="mcal"></table></div>
+    </div>
+  </section>
+
+  <!-- 利用者管理 -->
+  <section id="tab-users" class="hidden">
+    <div class="panel">
+      <div class="actions">
+        <button class="primary big" id="btnAddUser">＋ 利用者を追加</button>
+      </div>
+      <p class="hint" id="usersHint"></p>
+      <div class="selbar">
+        <span class="selcount" id="selCount"></span>
+        <button class="small" id="btnSelAll">全員選択</button>
+        <button class="small" id="btnSelNone">全員の選択を解除</button>
+        <button class="primary" id="btnSelPng">選択した利用者の画像を保存</button>
+      </div>
+      <p class="hint" style="margin-top:-4px">チェックは「画像に載せる人」を選ぶためのものです。チェックを変えてもシフトは変わりません。</p>
+      <div class="list-wrap"><table class="list" id="userTable"></table></div>
+    </div>
+  </section>
+
+  <!-- 設定 -->
+  <section id="tab-settings" class="hidden">
+    <div class="panel">
+      <h2>基本設定</h2>
+      <div class="actions">
+        <label>1日の定員（上限）：<input type="number" id="capInput" min="1" max="200" style="font-size:18px;width:90px;padding:6px"> 人</label>
+        <label>1日の目標人数：<input type="number" id="dtInput" min="0" max="200" style="font-size:18px;width:90px;padding:6px"> 人</label>
+        <button id="btnCap">保存</button>
+      </div>
+      <p class="hint">目標人数は目安です。届かない日はシフト表でオレンジ色に表示されます（人数合わせのために利用者を休みにはしません）。0にすると表示しません。</p>
+      <div class="field" style="margin-top:12px">
+        <label>毎週の休業曜日（日曜は常に休み、土曜は「通所日の設定」で月ごとに指定）</label>
+        <div class="wdsel" id="cwSel"></div>
+      </div>
+    </div>
+    <div class="panel" id="syncPanel">
+      <h2>スマホ・パソコン間の同期（GitHub）</h2>
+      <div id="syncState"></div>
+      <p class="hint" style="margin-top:0">GitHubの<b>非公開（Private）リポジトリ</b>にデータを保存して、どの端末から開いても同じデータを使えるようにします。設定方法は「GitHub設定手順.txt」をご覧ください。変更は数秒後に自動で送信され、ほかの端末の変更は画面を開いたときに自動で読み込まれます。</p>
+      <div class="grid">
+        <div><label>GitHubのユーザー名</label><input id="syOwner" placeholder="例：yamada-taro" autocomplete="off" autocapitalize="off"></div>
+        <div><label>データ用リポジトリ名（非公開）</label><input id="syRepo" placeholder="例：shift-data" autocomplete="off" autocapitalize="off"></div>
+        <div><label>トークン</label><input id="syToken" type="password" placeholder="github_pat_…" autocomplete="off"></div>
+      </div>
+      <details style="margin-bottom:10px"><summary class="hint" style="cursor:pointer">詳細設定（通常は変更不要）</summary>
+        <div class="grid">
+          <div><label>ファイル名</label><input id="syPath" autocomplete="off" autocapitalize="off"></div>
+          <div><label>ブランチ</label><input id="syBranch" autocomplete="off" autocapitalize="off"></div>
+        </div>
+      </details>
+      <div class="actions">
+        <button class="primary" id="btnSyConnect">接続する</button>
+        <span id="syConnected" class="actions hidden">
+          <button id="btnSyNow">今すぐ同期</button>
+          <button id="btnSyCode">ほかの端末用の設定コードを表示</button>
+          <button class="danger small" id="btnSyOff">この端末の同期をやめる</button>
+        </span>
+      </div>
+      <div id="syCodeBox" class="hidden" style="margin-top:12px">
+        <label>設定コード（ほかの端末の「設定コードで接続」に貼り付けます）</label>
+        <textarea id="syCodeOut" readonly></textarea>
+        <div class="actions" style="margin-top:6px"><button class="small" id="btnSyCopy">コピー</button>
+        <span class="hint">⚠ このコードにはトークンが含まれます。自分の端末以外には送らないでください。</span></div>
+      </div>
+      <div style="margin-top:16px;border-top:1px solid var(--line);padding-top:12px">
+        <label>設定コードで接続（2台目以降のスマホ・パソコン）</label>
+        <textarea id="syCodeIn" placeholder="BSHIFT1:… を貼り付け"></textarea>
+        <div class="actions" style="margin-top:6px"><button class="primary" id="btnSyUseCode">設定コードで接続</button></div>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>バックアップ・復元</h2>
+      <p class="hint">データはこのパソコンのブラウザ内に自動保存されています。念のため、月に1回程度バックアップファイルを保存しておくと安心です。</p>
+      <div class="actions">
+        <button class="primary" id="btnBackup">バックアップを保存</button>
+        <button id="btnRestore">バックアップから復元</button>
+        <input type="file" id="restoreFile" accept=".json,application/json" class="hidden">
+      </div>
+    </div>
+    <div class="panel">
+      <h2>保存されているシフト（月別）</h2>
+      <div class="list-wrap"><table class="list" id="monthTable"></table></div>
+    </div>
+    <div class="panel">
+      <h2>サンプルデータ・初期化</h2>
+      <p class="hint">初めは操作を試せるようにサンプルの利用者が入っています。実際に使い始めるときは「すべてのデータを削除」を押してから、利用者を登録してください。</p>
+      <div class="actions">
+        <button class="danger" id="btnWipe">すべてのデータを削除して実運用を開始</button>
+        <button id="btnSample">サンプルデータを読み込む</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- 利用者編集 -->
+<div class="modal-bg" id="userModal">
+  <div class="modal">
+    <h3 id="umTitle">利用者の編集</h3>
+    <div class="field">
+      <label>名字</label>
+      <input type="text" id="umName" placeholder="例：佐藤" maxlength="12">
+    </div>
+    <div class="field">
+      <label>通所希望日数（1か月）</label>
+      <input type="number" id="umDesired" min="0" max="31" placeholder="空欄＝毎日通所可能">
+      <div class="hint" id="umDesiredHint"></div>
+    </div>
+    <div class="field">
+      <label>通所できない曜日（複数選べます）</label>
+      <div class="wdsel" id="umWd"></div>
+    </div>
+    <div class="field">
+      <label>個別の通所不可日（日付をクリックで指定／解除）</label>
+      <div class="calnav">
+        <button class="small" id="umCalPrev">‹</button>
+        <b id="umCalLabel"></b>
+        <button class="small" id="umCalNext">›</button>
+      </div>
+      <table class="cal" id="umCal"></table>
+      <div class="chips" id="umChips"></div>
+    </div>
+    <div class="field">
+      <label><input type="checkbox" id="umActive" style="width:20px;height:20px;vertical-align:-4px"> 有効（シフト作成の対象にする）</label>
+    </div>
+    <div class="foot">
+      <button id="umCancel">キャンセル</button>
+      <button class="primary" id="umSave">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- 画像出力 -->
+<div class="modal-bg" id="pngModal">
+  <div class="modal wide">
+    <h3 id="pmTitle">PNG画像を出力</h3>
+    <div class="optlist" id="pmOpts">
+      <label class="opt"><input type="radio" name="pmode" value="simple"><b>シンプルな縦長リスト（LINE向け・おすすめ）</b>
+        <div class="desc">日付と「〇 名前さん」だけを表示します。チェックした利用者だけが載ります。</div></label>
+      <label class="opt"><input type="radio" name="pmode" value="person"><b>個別カレンダー（1人1枚）</b>
+        <div class="desc">チェックした利用者ごとに、その人専用の月間カレンダーを1枚ずつ保存します。</div></label>
+      <label class="opt"><input type="radio" name="pmode" value="sel"><b>選択した利用者のカレンダー</b>
+        <div class="desc">チェックした利用者の名字だけを、カレンダー形式で表示します。本人や家族への共有に。</div></label>
+      <label class="opt"><input type="radio" name="pmode" value="all"><b>全体カレンダー</b>
+        <div class="desc">全利用者の通所予定を、日付ごとにまとめてカレンダー形式で表示します。</div></label>
+      <label class="opt"><input type="radio" name="pmode" value="table"><b>全体の一覧表</b>
+        <div class="desc">横に日付、縦に名字を並べた一覧表です（予定・目標・差つき）。</div></label>
+    </div>
+    <div id="pmPick">
+      <div class="selbar" style="margin:4px 0 8px">
+        <span class="selcount" id="pmCount"></span>
+        <button class="small" id="pmAll">全員選択</button>
+        <button class="small" id="pmNone">全員の選択を解除</button>
+      </div>
+      <div class="pickgrid" id="pmGrid"></div>
+    </div>
+    <p class="hint" id="pmFname"></p>
+    <div class="foot">
+      <button id="pmCancel">閉じる</button>
+      <button class="primary big" id="pmSave">画像を保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- 個別カレンダー：日付の画面 -->
+<div class="modal-bg" id="dayModal">
+  <div class="modal">
+    <h3 id="dmTitle"></h3>
+    <div class="field">
+      <div id="dmState" style="margin-bottom:10px"></div>
+      <button class="primary" id="dmToggle"></button>
+    </div>
+    <div class="field">
+      <label>備考（〇の横に小さく表示されます）</label>
+      <input type="text" id="dmNote" maxlength="20" placeholder="例：午前のみ／送迎なし／14時まで" style="max-width:100%">
+      <div class="hint">20文字まで。短いほど大きく見やすく表示されます（目安：6文字×3行）。</div>
+    </div>
+    <div class="foot">
+      <button id="dmClear">備考を消す</button>
+      <button id="dmClose">閉じる</button>
+      <button class="primary" id="dmSave">保存</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+'use strict';
+/* =========================================================
+   基本データ
+   ========================================================= */
+const STORE_KEY = 'btype-shift-data-v1';   // 保存場所は変えない（既存データを引き継ぐ）
+const WD = ['日','月','火','水','木','金','土'];
+const TARGET_OFFSET = 8;        // 通所目標日数 ＝ 暦日数 − 8
+let state = null;
+let currentTab = 'shift';
+
+const pad2 = n => String(n).padStart(2,'0');
+const ymOf = (y,m) => `${y}-${pad2(m)}`;
+const ymParts = ym => ym.split('-').map(Number);
+const daysIn = ym => { const [y,m]=ymParts(ym); return new Date(y,m,0).getDate(); };
+const weekday = (ym,d) => { const [y,m]=ymParts(ym); return new Date(y,m-1,d).getDay(); };
+const dateStr = (ym,d) => `${ym}-${pad2(d)}`;
+const baseTarget = ym => daysIn(ym) - TARGET_OFFSET;
+const ymLabel = ym => { const [y,m]=ymParts(ym); return `${y}年${m}月`; };
+const addMonth = (ym,k) => { const [y,m]=ymParts(ym); const d=new Date(y,m-1+k,1); return ymOf(d.getFullYear(), d.getMonth()+1); };
+const todayYM = () => { const d=new Date(); return ymOf(d.getFullYear(), d.getMonth()+1); };
+const esc = s => String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+function defaultState(){
+  // cal：月ごとの通所日設定 {ym:{sat:[土曜通所日], closed:[臨時休業日]}}（シフトとは別に保存）
+  // selected：画像に載せる利用者の選択状態（シフトデータとは無関係）
+  // closedWeekdays：毎週の休業曜日（初期値：なし）／ dailyTarget：1日の目標人数（表示用の目安）
+  return {version:4, capacity:20, dailyTarget:9, closedWeekdays:[], users:[], months:{}, cal:{}, selected:[], currentYM:addMonth(todayYM(),1), nextId:1};
+}
+
+/* =========================================================
+   日本の祝日（インターネット不要・計算で判定）
+   祝日法に基づく：固定祝日／ハッピーマンデー／春分・秋分／振替休日／国民の休日
+   ========================================================= */
+const HOL_CACHE = {};
+function holidaysOf(y){
+  if(HOL_CACHE[y]) return HOL_CACHE[y];
+  const base = {};
+  const key = (m,d)=>`${m}-${d}`;
+  const set = (m,d,n)=>{ base[key(m,d)] = n; };
+  const nthMon = (m,n)=>{ const f=new Date(y,m-1,1).getDay(); return 1 + ((8-f)%7) + (n-1)*7; };
+  const t = y - 1980;
+  set(1,1,'元日');
+  set(1,nthMon(1,2),'成人の日');
+  set(2,11,'建国記念の日');
+  if(y>=2020) set(2,23,'天皇誕生日');
+  set(3, Math.floor(20.8431 + 0.242194*t - Math.floor(t/4)), '春分の日');
+  set(4,29,'昭和の日');
+  set(5,3,'憲法記念日'); set(5,4,'みどりの日'); set(5,5,'こどもの日');
+  if(y===2020){ set(7,23,'海の日'); set(7,24,'スポーツの日'); set(8,10,'山の日'); }
+  else if(y===2021){ set(7,22,'海の日'); set(7,23,'スポーツの日'); set(8,8,'山の日'); }
+  else { set(7,nthMon(7,3),'海の日'); set(8,11,'山の日'); set(10,nthMon(10,2),'スポーツの日'); }
+  set(9,nthMon(9,3),'敬老の日');
+  set(9, Math.floor(23.2488 + 0.242194*t - Math.floor(t/4)), '秋分の日');
+  set(11,3,'文化の日'); set(11,23,'勤労感謝の日');
+  if(y<=2018) set(12,23,'天皇誕生日');
+  const H = Object.assign({}, base);
+  const kd = dt => key(dt.getMonth()+1, dt.getDate());
+  // 国民の休日（祝日に挟まれた平日）
+  for(let dt=new Date(y,0,2); dt.getFullYear()===y; dt.setDate(dt.getDate()+1)){
+    const prev=new Date(dt), next=new Date(dt); prev.setDate(dt.getDate()-1); next.setDate(dt.getDate()+1);
+    if(!base[kd(dt)] && dt.getDay()!==0 && base[kd(prev)] && base[kd(next)]) H[kd(dt)] = '国民の休日';
+  }
+  // 振替休日（祝日が日曜なら、その後の最初の祝日でない日）
+  for(const k in base){
+    const [m,d] = k.split('-').map(Number);
+    const dt = new Date(y,m-1,d);
+    if(dt.getDay()!==0) continue;
+    const n = new Date(dt);
+    do{ n.setDate(n.getDate()+1); } while(H[kd(n)] && n.getFullYear()===y);
+    if(n.getFullYear()===y) H[kd(n)] = '振替休日';
+  }
+  return HOL_CACHE[y] = H;
+}
+const holidayName = (ym,d)=>{ const [y,m]=ymParts(ym); return holidaysOf(y)[`${m}-${d}`] || ''; };
+
+/* 事業所としてその日が通所日かどうか */
+function calOf(ym){ return state.cal[ym] || {sat:[], closed:[]}; }
+function dayInfo(ym,d){
+  const w = weekday(ym,d), hol = holidayName(ym,d), c = calOf(ym);
+  if(hol)   return {open:false, kind:'hol', label:hol};
+  if(w===0) return {open:false, kind:'sun', label:'日曜（休み）'};
+  if(w!==6 && (state.closedWeekdays||[]).includes(w)) return {open:false, kind:'wclosed', label:`${WD[w]}曜（休業日）`};
+  if(w===6) return (c.sat||[]).includes(d) ? {open:true, kind:'satopen', label:'土曜通所日'} : {open:false, kind:'satoff', label:'土曜（休み）'};
+  if((c.closed||[]).includes(d)) return {open:false, kind:'closed', label:'休業日'};
+  return {open:true, kind:'wd', label:''};
+}
+const isOpen = (ym,d) => dayInfo(ym,d).open;
+function openDays(ym){ const r=[]; for(let d=1; d<=daysIn(ym); d++) if(isOpen(ym,d)) r.push(d); return r; }
+function save(){
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
+  catch(e){ alert('データを保存できませんでした。\n' + e.message); }
+  if(typeof syncAfterSave === 'function') syncAfterSave();   // GitHub同期（設定している場合）
+}
+function load(){
+  try{
+    const s = localStorage.getItem(STORE_KEY);
+    if(s){
+      state = JSON.parse(s);
+      const oldVer = state.version || 1;
+      normalize();
+      // 以前の版のサンプルデータ（28人）のままなら、新しいテストデータ（22人）に入れ替える
+      if(oldVer < 3 && isOldSample()){ state.months = {}; loadSample(); save(); }
+      // 版3まで「月曜は休業日」だった設定を解除（月〜金は基本通所日）
+      if(oldVer < 4){
+        if(JSON.stringify(state.closedWeekdays)==='[1]') state.closedWeekdays = [];
+        if(isTestSample()) state.months = {};   // テストデータのシフトは新しいルールで作り直す
+        save();
+      }
+      return;
+    }
+  }catch(e){ alert('保存データの読み込みに失敗しました。バックアップから復元してください。'); }
+  state = defaultState();
+  loadSample();
+  save();
+}
+function normalize(){
+  const d = defaultState();
+  for(const k of Object.keys(d)) if(state[k]===undefined) state[k]=d[k];
+  state.users.forEach(u=>{
+    u.ngWeekdays = u.ngWeekdays || [];
+    u.ngDates = u.ngDates || [];
+    if(u.active===undefined) u.active = true;
+    if(u.desired===undefined || u.desired==='') u.desired = null;
+  });
+  for(const ym in state.months){
+    const m = state.months[ym];
+    m.assign = m.assign || {}; m.manual = m.manual || {}; m.names = m.names || {}; m.notes = m.notes || {};
+  }
+  for(const ym in state.cal){ const c=state.cal[ym]; c.sat=c.sat||[]; c.closed=c.closed||[]; }
+  state.selected = (state.selected||[]).filter(id=>state.users.some(u=>u.id===id));
+  state.version = 4;
+}
+function isOldSample(){
+  const old = '佐藤,鈴木,高橋,田中,伊藤,渡辺,山本,中村,小林,加藤,吉田,山田,佐々木,山口,松本,井上,木村,林,斎藤,清水,山崎,森,池田,橋本,阿部,石川,前田,藤田';
+  return state.users.map(u=>u.name).join(',') === old;
+}
+function isTestSample(){
+  return state.users.map(u=>u.name).join(',') === '田中,山本,佐藤,鈴木,高橋,伊藤,渡辺,中村,小林,加藤,吉田,山田,佐々木,山口,松本,井上,木村,林,斎藤,清水,山崎,森';
+}
+const useDailyTarget = () => Number(state.dailyTarget) > 0;
+// 「毎日通所可能」＝通所希望日数が空欄の人。事業所の通所日のうち、本人が通える日すべてに入れる
+const isFlex = u => (u.desired===null || u.desired===undefined);
+const userOpenDays = (u, ym) => openDays(ym).filter(d=>!isNG(u,ym,d));
+const isSelected = id => state.selected.includes(id);
+const findUser = id => state.users.find(u=>u.id===id);
+const newId = () => 'u' + (state.nextId++);
+function targetOf(u, ym){
+  if(isFlex(u)) return userOpenDays(u, ym).length;     // 毎日通所可能：通える日すべて
+  return Math.max(0, Math.min(Number(u.desired), daysIn(ym)));
+}
+function isNG(u, ym, d){
+  return u.ngWeekdays.includes(weekday(ym,d)) || u.ngDates.includes(dateStr(ym,d));
+}
+
+/* =========================================================
+   サンプルデータ
+   ========================================================= */
+function loadSample(){
+  const ym = state.currentYM;
+  // 「〇曜のみ」は、それ以外の曜日を通所不可として登録（日曜・月曜・祝日は事業所の休み）
+  const only = days => [0,1,2,3,4,5,6].filter(w=>!days.includes(w));
+  const S = [
+    // 個別条件のある利用者（8人）
+    ['田中',  only([1,4,5,6]), 15],   // 月・木・金・土のみ、月15日
+    ['山本',  [], 15],                // 曜日制限なし、月15日
+    ['佐藤',  [], 15],                // 曜日制限なし、月15日
+    ['鈴木',  only([1,3,5]), null],   // 月・水・金のみ
+    ['高橋',  only([1,3,5]), null],   // 月・水・金のみ
+    ['伊藤',  only([2,4]), null],     // 火・木のみ
+    ['渡辺',  only([5]), null],       // 金曜日のみ
+    ['中村',  [0,6], null],           // 平日のみ
+    // 毎日通所可能な利用者（14人）
+    ['小林',[],null],['加藤',[],null],['吉田',[],null],['山田',[],null],['佐々木',[],null],
+    ['山口',[],null],['松本',[],null],['井上',[],null],['木村',[],null],['林',[],null],
+    ['斎藤',[],null],['清水',[],null],['山崎',[],null],['森',[],null]
+  ];
+  state.users = S.map(([name,wd,des,dates,active])=>({
+    id:newId(), name, desired:des, ngWeekdays:wd.slice(),
+    ngDates:(dates||[]).filter(d=>d<=daysIn(ym)).map(d=>dateStr(ym,d)),
+    active: active!==false
+  }));
+  // サンプル：第1・第3土曜日を通所日にする
+  const sats = []; for(let d=1; d<=daysIn(ym); d++) if(weekday(ym,d)===6) sats.push(d);
+  state.cal[ym] = {sat:[sats[0], sats[2]].filter(Boolean), closed:[]};
+  state.selected = state.users.slice(0,3).map(u=>u.id);
+}
+
+/* =========================================================
+   自動シフト作成アルゴリズム
+   優先1：定員厳守 / 優先2：不可曜日・不可日厳守
+   優先3：希望日数の充足 / 優先4：日ごとの人数の平準化
+   優先5：利用者間の公平性（不足が出る場合は割合で均等に）
+   ========================================================= */
+function generateShift(ym){
+  const D = daysIn(ym), cap = state.capacity;
+  const ALL = state.users.filter(u=>u.active).map((u,i)=>{
+    const allowed = [];
+    for(let d=1; d<=D; d++) if(isOpen(ym,d) && !isNG(u,ym,d)) allowed.push(d);   // 事業所の休み・本人の不可日は除外
+    const flex = isFlex(u);
+    const target = flex ? allowed.length : targetOf(u,ym);   // 毎日通所可能は通える日すべて
+    return {id:u.id, order:i, allowed, aset:new Set(allowed), target, flex, set:new Set()};
+  });
+  const cnt = new Array(D+2).fill(0);
+  const add = (p,d)=>{ p.set.add(d); cnt[d]++; };
+  const rem = (p,d)=>{ p.set.delete(d); cnt[d]--; };
+  const need = p => p.target - p.set.size;
+  const ratio = p => p.target>0 ? p.set.size/p.target : 1;
+  const cmp = (a,b)=>{ for(let i=0;i<a.length;i++){ if(a[i]<b[i]) return -1; if(a[i]>b[i]) return 1; } return 0; };
+  const OPEN = openDays(ym);
+
+  // P の利用者を、1日 limit 人までの範囲で割り振る
+  function solve(P, limit){
+    const freeDays = p => p.allowed.filter(d=>!p.set.has(d) && cnt[d]<limit);
+
+    // 日を選ぶ：人数が少ない日 → 他の人が使いたい日を避ける → 連続を少し避ける
+    function pickDay(p, cands){
+      const pres = new Array(D+2).fill(0);
+      for(const q of P){
+        if(q===p || need(q)<=0) continue;
+        const fr = freeDays(q); if(!fr.length) continue;
+        const w = Math.min(1, need(q)/fr.length);
+        for(const d of fr) pres[d] += w;
+      }
+      let best=null, bc=Infinity;
+      for(const d of cands){
+        const adj = (p.set.has(d-1)?1:0) + (p.set.has(d+1)?1:0);
+        const tie = ((d*31 + p.order*17) % 97) / 1000;
+        const c = cnt[d] + pres[d]*0.3 + adj*0.15 + tie;
+        if(c<bc){ bc=c; best=d; }
+      }
+      return best;
+    }
+
+    // 第1段階：不足割合の大きい人から1日ずつ（余裕のない人は最優先）
+    function greedy(){
+      for(let guard=0; guard<200000; guard++){
+        let best=null, bk=null, bfree=null;
+        for(const p of P){
+          if(need(p)<=0) continue;
+          const fr = freeDays(p); if(!fr.length) continue;
+          const slack = fr.length - need(p);
+          const key = [slack<=0?0:1, ratio(p), slack, p.order];
+          if(!best || cmp(key,bk)<0){ best=p; bk=key; bfree=fr; }
+        }
+        if(!best) break;
+        add(best, pickDay(best, bfree));
+      }
+    }
+    greedy();
+
+    // 第2段階：入れ替えによる救済と、不足の公平化
+    for(let round=0, changed=true; changed && round<500; round++){
+      changed = false;
+      for(const p of P){
+        for(let g=0; need(p)>0 && g<100; g++){
+          const fr = freeDays(p);
+          if(fr.length){ add(p, pickDay(p,fr)); changed=true; continue; }
+          let done=false;
+          for(const d of p.allowed){
+            if(p.set.has(d)) continue;
+            for(const q of P){
+              if(q===p || !q.set.has(d)) continue;
+              const alt = q.allowed.filter(e=>!q.set.has(e) && cnt[e]<limit);
+              if(alt.length){ rem(q,d); add(q, pickDay(q,alt)); add(p,d); done=true; break; }
+            }
+            if(done) break;
+          }
+          if(done){ changed=true; continue; }
+          let bq=null, bd=null, bgap=-Infinity;
+          const pAfter = (p.set.size+1)/p.target, pNow = ratio(p);
+          for(const d of p.allowed){
+            if(p.set.has(d)) continue;
+            for(const q of P){
+              if(q===p || !q.set.has(d) || q.target<=0) continue;
+              const qNow = ratio(q), qAfter = (q.set.size-1)/q.target;
+              if(qNow > pNow + 1e-9 && qAfter >= pAfter - 1e-9){
+                const gap = qAfter - pAfter;
+                if(gap > bgap){ bgap=gap; bq=q; bd=d; }
+              }
+            }
+          }
+          if(bq){ rem(bq,bd); add(p,bd); changed=true; continue; }
+          break;
+        }
+      }
+    }
+
+    // 第3段階：日ごとの人数の偏りをならす（P の利用者だけを動かす）
+    for(let it=0; it<20000; it++){
+      const desc = OPEN.slice().sort((a,b)=>cnt[b]-cnt[a]);
+      const asc  = OPEN.slice().sort((a,b)=>cnt[a]-cnt[b]);
+      let moved=false;
+      outer:
+      for(const hi of desc){
+        for(const lo of asc){
+          if(cnt[hi]-cnt[lo] < 2) break;
+          if(cnt[lo] >= limit) continue;
+          for(const p of P){
+            if(p.set.has(hi) && !p.set.has(lo) && p.aset.has(lo)){
+              rem(p,hi); add(p,lo); moved=true; break outer;
+            }
+          }
+        }
+      }
+      if(!moved) break;
+    }
+    greedy();   // ならした後に空いた枠を埋め直す
+  }
+
+  const FIX = ALL.filter(p=>!p.flex), FLEX = ALL.filter(p=>p.flex);
+  // ① 毎日通所可能な人：通える日すべてに入れる（人数合わせのために休みにはしない）
+  //    毎日通所可能な人だけで定員を超える日は、その月の日数が少ない人から順に入れる
+  for(const d of OPEN){
+    const cands = FLEX.filter(p=>p.aset.has(d)).sort((a,b)=>a.set.size-b.set.size || a.order-b.order);
+    for(const p of cands){ if(cnt[d] >= cap) break; add(p,d); }
+  }
+  // ② 日数の決まっている人（月15日など）：空きのある日に、人数が少ない日を優先して配置
+  solve(FIX, cap);
+  // ③ 定員の都合で日数指定の人が足りない場合だけ、その日の毎日通所可能な人と入れ替える
+  //    （日数指定の条件を優先。外れた人は「作成結果の確認」に理由を表示）
+  for(const p of FIX){
+    for(let g=0; need(p)>0 && g<100; g++){
+      let best=null, bd=null;
+      for(const d of p.allowed){
+        if(p.set.has(d) || cnt[d] < cap) continue;
+        for(const q of FLEX) if(q.set.has(d) && (!best || q.set.size > best.set.size)){ best=q; bd=d; }
+      }
+      if(!best) break;
+      rem(best,bd); add(p,bd);
+    }
+  }
+
+  const assign = {};
+  for(const p of ALL) assign[p.id] = [...p.set].sort((a,b)=>a-b);
+  return assign;
+}
+
+/* =========================================================
+   分析・検証
+   ========================================================= */
+function rowsForMonth(ym){
+  const m = state.months[ym];
+  const rows = [], seen = new Set();
+  for(const u of state.users){
+    const has = m && m.assign[u.id] && m.assign[u.id].length;
+    if(u.active || has){ rows.push({id:u.id, name:u.name, user:u}); seen.add(u.id); }
+  }
+  if(m) for(const id in m.assign){
+    if(!seen.has(id) && !findUser(id) && m.assign[id].length)
+      rows.push({id, name:(m.names[id]||'不明')+'（削除済）', user:null});
+  }
+  return rows;
+}
+
+function analyze(ym){
+  const D = daysIn(ym), cap = state.capacity, m = state.months[ym];
+  const rows = rowsForMonth(ym);
+  const cnt = new Array(D+2).fill(0);
+  const sets = {};
+  for(const r of rows){
+    sets[r.id] = new Set(m && m.assign[r.id] ? m.assign[r.id] : []);
+    for(const d of sets[r.id]) if(d>=1 && d<=D) cnt[d]++;
+  }
+  const errors = [], warnings = [];
+  for(let d=1; d<=D; d++) if(cnt[d] > cap) errors.push(`${d}日（${WD[weekday(ym,d)]}）が定員${cap}人を超えています（${cnt[d]}人）`);
+  for(let d=1; d<=D; d++){
+    const info = dayInfo(ym,d);
+    if(!info.open && cnt[d]>0) errors.push(`${d}日（${WD[weekday(ym,d)]}）は事業所の休み（${info.label}）ですが、${cnt[d]}人が割り当てられています。「自動シフト作成」をやり直してください`);
+  }
+
+  const open = openDays(ym);
+  let totalDemand = 0;
+  const totalCap = cap * open.length;
+  for(const r of rows){
+    const set = sets[r.id];
+    r.assigned = set.size;
+    r.days = set;
+    if(!r.user){ r.target=null; r.diff=null; continue; }
+    const u = r.user;
+    r.target = u.active ? targetOf(u,ym) : null;
+    for(const d of set) if(isNG(u,ym,d)) warnings.push(`${u.name}さん：通所不可の${d}日（${WD[weekday(ym,d)]}）に割り当てられています`);
+    if(!u.active){ r.diff=null; continue; }
+    const allowed = open.filter(d=>!isNG(u,ym,d));
+    r.allowedCount = allowed.length;
+    if(isFlex(u)){
+      // 毎日通所可能：通える日すべてが目標。入っていない日があれば理由を表示
+      r.flex = true; r.target = r.maxDays = allowed.length;
+      r.diff = r.assigned - r.target; r.reason = '';
+      if(r.diff < 0){
+        const miss = allowed.filter(d=>!set.has(d));
+        const full = miss.filter(d=>cnt[d] >= cap), other = miss.filter(d=>cnt[d] < cap);
+        const parts = [];
+        if(full.length) parts.push(`${full.map(d=>d+'日').join('・')}は定員${cap}人に達しているため入れませんでした（日数指定のある利用者を優先）`);
+        if(other.length) parts.push(`${other.map(d=>d+'日').join('・')}は手動修正で休みになっています`);
+        r.reason = parts.join('。');
+      }
+      continue;
+    }
+    totalDemand += Math.min(r.target, allowed.length);
+    r.diff = r.assigned - r.target;
+    r.reason = '';
+    if(r.diff < 0){
+      const ngw = u.ngWeekdays.slice().sort().map(w=>WD[w]).join('・');
+      const ngd = u.ngDates.filter(s=>s.startsWith(ym+'-')).map(s=>Number(s.slice(8)));
+      const parts = [];
+      const reach = Math.min(r.target, allowed.length);
+      if(r.assigned < reach){
+        const free = allowed.filter(d=>!set.has(d) && cnt[d]<cap);
+        parts.push(free.length===0
+          ? `定員（${cap}人）に達している日が多く、${reach - r.assigned}日分入れられませんでした（全員の不足が均等になるよう調整済み）`
+          : `手動修正などで割り振りが減っています（空きのある通所可能日が${free.length}日あります）`);
+      }
+      if(allowed.length < r.target){
+        if(allowed.length === open.length){
+          parts.unshift(`この月の事業所の通所日が${open.length}日しかありません（日曜・祝日・休業曜日・指定外の土曜は休み）`);
+        }else{
+          let det = [`事業所の通所日${open.length}日`];
+          if(ngw) det.push(`本人の不可曜日：${ngw}`);
+          if(ngd.length) det.push(`本人の不可日：${ngd.join('・')}日`);
+          parts.unshift(`通える日が月に${allowed.length}日しかありません（${det.join('／')}）`);
+        }
+      }
+      r.reason = parts.join('。さらに、');
+    }
+  }
+
+  // 1日の目標人数に届かない日と、その理由
+  const T = useDailyTarget() ? Math.min(Number(state.dailyTarget), cap) : 0;
+  const dayShort = [];
+  if(T > 0 && m){
+    for(const d of open){
+      if(cnt[d] >= T) continue;
+      const can = rows.filter(r=>r.user && r.user.active && !isNG(r.user,ym,d));
+      const rest = can.filter(r=>!r.days.has(d));
+      let reason;
+      if(!rest.length) reason = `この日に通える利用者が${can.length}人しかいません（曜日条件・不可日のため）`;
+      else if(rest.every(r=> r.flex ? r.assigned >= r.maxDays : r.assigned >= r.target))
+        reason = `この日に通える残りの${rest.length}人は、希望日数（月15日など）に達しています`;
+      else reason = `手動修正などで減っています（あと${rest.length}人が配置可能です）`;
+      dayShort.push({d, n:cnt[d], short:T-cnt[d], reason});   // 目安との差を表示するだけで、無理に増減はしない
+    }
+  }
+  return {rows, cnt, errors, warnings, totalDemand, totalCap, open, T, dayShort};
+}
+
+/* =========================================================
+   画面描画
+   ========================================================= */
+function render(){
+  const ym = state.currentYM;
+  document.getElementById('ymLabel').textContent = ymLabel(ym);
+  document.getElementById('ymPick').value = ym;
+  document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.toggle('active', b.dataset.tab===currentTab));
+  ['shift','cal','users','settings'].forEach(t=>document.getElementById('tab-'+t).classList.toggle('hidden', t!==currentTab));
+  if(currentTab==='shift'){
+    document.querySelectorAll('.viewtabs button').forEach(b=>b.classList.toggle('active', b.dataset.view===shiftView));
+    document.getElementById('viewAll').classList.toggle('hidden', shiftView!=='all');
+    document.getElementById('viewPerson').classList.toggle('hidden', shiftView!=='person');
+    renderShift();
+    if(shiftView==='person') renderPerson();
+  }
+  if(currentTab==='cal') renderCal();
+  if(currentTab==='users') renderUsers();
+  if(currentTab==='settings'){ renderSettings(); if(typeof renderSyncPanel==='function') renderSyncPanel(); }
+}
+
+function renderShift(){
+  const ym = state.currentYM, D = daysIn(ym), cap = state.capacity, m = state.months[ym];
+  const A = analyze(ym);
+  const activeN = state.users.filter(u=>u.active).length;
+
+  const satOpen = A.open.filter(d=>weekday(ym,d)===6).length;
+  document.getElementById('summary').innerHTML =
+    `<div>暦日数 <b>${D}</b> 日</div><div>事業所の通所日 <b>${A.open.length}</b> 日（うち土曜 ${satOpen}日）</div>` +
+    (A.T ? `<div>1日の目標（目安） <b>${A.T}</b> 人</div>` : '') +
+    `<div>1日の定員 <b>${cap}</b> 人</div><div>対象の利用者 <b>${activeN}</b> 人</div>` +
+    `<div>延べ通所予定 <b>${A.cnt.reduce((a,b)=>a+b,0)}</b> 人日 ／ 月の総定員 <b>${A.totalCap}</b> 人日</div>`;
+
+  const manualCount = m ? Object.values(m.manual).reduce((s,a)=>s+a.length,0) : 0;
+  let notice = '';
+  const sats = []; for(let d=1; d<=D; d++) if(weekday(ym,d)===6) sats.push(d);
+  if(sats.length && !calOf(ym).sat.length)
+    notice += `<div class="notice">⚠ ${ymLabel(ym)}は、土曜日の通所日がまだ指定されていません（土曜日はすべて休みとして扱います）。「<b>通所日の設定</b>」で指定できます。</div>`;
+  if(false)
+    notice += `<div class="notice">基本の通所目標（${baseTarget(ym)}日）が、この月の事業所の通所日（${A.open.length}日）より多いため、目標日数が空欄の利用者は最大でも${A.open.length}日になります。</div>`;
+  if(!m) notice += `<div class="notice">${ymLabel(ym)}のシフトはまだ作成されていません。「<b>自動シフト作成</b>」を押してください。</div>`;
+  else {
+    const t = m.generatedAt ? new Date(m.generatedAt) : null;
+    notice += `<div class="hint">${t?`自動作成：${t.getMonth()+1}/${t.getDate()} ${pad2(t.getHours())}:${pad2(t.getMinutes())}`:'手動作成'}${manualCount?`　／　手動修正 ${manualCount} か所（自動作成をやり直すと上書きされます）`:''}</div>`;
+  }
+  document.getElementById('monthNotice').innerHTML = notice;
+
+  const info = []; for(let d=1; d<=D; d++) info[d] = dayInfo(ym,d);
+  const cls = d => { const w=weekday(ym,d); return (w===0?'sun':w===6?'sat':'') + (info[d].open?'':' closed') + (info[d].kind==='hol'?' hol':''); };
+  let h = '<thead><tr><th class="name" rowspan="2">名字</th>';
+  for(let d=1; d<=D; d++) h += `<th class="${cls(d)}" title="${esc(info[d].label)}">${d}</th>`;
+  h += '<th rowspan="2">予定</th><th rowspan="2">目標</th><th rowspan="2">差</th></tr><tr>';
+  for(let d=1; d<=D; d++) h += `<th class="${cls(d)}" title="${esc(info[d].label)}">${info[d].kind==='hol'?'祝':WD[weekday(ym,d)]}</th>`;
+  h += '</tr></thead><tbody>';
+  if(!A.rows.length) h += `<tr><td class="name" colspan="${D+4}" style="padding:16px">利用者が登録されていません。「利用者管理」から追加してください。</td></tr>`;
+  for(const r of A.rows){
+    const man = new Set(m && m.manual[r.id] ? m.manual[r.id] : []);
+    h += `<tr class="${r.user&&!r.user.active?'inactive':''}"><td class="name">${esc(r.name)}${r.user&&!r.user.active?'（無効）':''}</td>`;
+    for(let d=1; d<=D; d++){
+      const on = r.days.has(d), closed = !info[d].open, ng = !closed && r.user && isNG(r.user,ym,d);
+      const c = ['c', cls(d), on?'on':'', ng&&!on?'ng':'', man.has(d)?'manual':''].join(' ');
+      const nt = noteOf(ym, r.id, d);
+      h += `<td class="${c}${nt?' hasnote':''}" data-u="${r.id}" data-d="${d}"${nt?` title="備考：${esc(nt)}"`:''}>${on?'○':(ng?'－':'')}</td>`;
+    }
+    const diff = r.diff===null ? '－' : (r.diff>0?'+'+r.diff:r.diff);
+    h += `<td class="sum">${r.assigned}</td><td class="sum" title="${r.flex?'毎日通所可能（通える日すべて）':''}">${r.target===null?'－':r.target}</td><td class="sum ${r.diff<0?'minus':''}">${diff}</td></tr>`;
+  }
+  h += '</tbody><tfoot><tr><td class="name">人数</td>';
+  let total = 0;
+  for(let d=1; d<=D; d++){
+    const c = A.cnt[d]; total += c;
+    if(!info[d].open && !c){ h += '<td class="closed">休</td>'; continue; }
+    h += `<td class="${c>=cap||!info[d].open?'full':(c>=cap-2?'near':(A.T&&c<A.T?'under':''))}" title="${A.T&&c<A.T&&info[d].open?`目標${A.T}人に${A.T-c}人不足`:''}">${c}</td>`;
+  }
+  h += `<td class="sum">${total}</td><td class="sum"></td><td class="sum"></td></tr><tr><td class="name">空き</td>`;
+  for(let d=1; d<=D; d++){
+    if(!info[d].open){ h += '<td class="closed">－</td>'; continue; }
+    const r = cap - A.cnt[d]; h += `<td class="${r<=0?'full':(r<=2?'near':'')}">${r}</td>`;
+  }
+  h += '<td class="sum"></td><td class="sum"></td><td class="sum"></td></tr></tfoot>';
+  document.getElementById('shiftTable').innerHTML = h;
+
+  renderReport(A);
+}
+
+function renderReport(A){
+  const ym = state.currentYM, m = state.months[ym];
+  let h = '';
+  if(!m){ document.getElementById('report').innerHTML = '<p class="hint">シフトを作成すると、ここに検証結果と不足の理由が表示されます。</p>'; return; }
+  if(!A.errors.length && !A.warnings.length)
+    h += `<p class="result-ok">✔ 検証OK：定員（${state.capacity}人）を超える日はありません。日曜・祝日・休業曜日・指定外の土曜への割り当てはありません。本人の通所不可の曜日・日付への割り当てもありません。</p>`;
+  if(A.errors.length) h += `<p class="result-ng">✖ 修正が必要な問題があります</p><ul>${A.errors.map(e=>`<li>${esc(e)}</li>`).join('')}</ul>`;
+  if(A.warnings.length) h += `<p class="result-ng">⚠ 通所不可日への割り当てがあります（手動修正によるもの）</p><ul>${A.warnings.map(e=>`<li>${esc(e)}</li>`).join('')}</ul>`;
+  if(A.totalDemand > A.totalCap)
+    h += `<div class="notice">希望日数の合計（${A.totalDemand}人日）が月の総定員（${A.totalCap}人日）を上回っているため、定員を優先して全員の不足が均等になるよう調整しています。</div>`;
+
+  if(A.T){
+    if(A.dayShort.length){
+      h += `<p class="result-ng">1日の目標（${A.T}人）に届かない日：${A.dayShort.length}日（条件を優先しているため、人数合わせはしていません）</p>`;
+      h += '<div class="list-wrap"><table class="list"><tr><th>日付</th><th>配置</th><th>不足</th><th>理由</th></tr>';
+      for(const x of A.dayShort) h += `<tr><td>${x.d}日（${WD[weekday(ym,x.d)]}）</td><td class="num">${x.n}人</td><td class="num" style="color:var(--bad);font-weight:bold">${x.short}人</td><td>${esc(x.reason)}</td></tr>`;
+      h += '</table></div>';
+    }else{
+      h += `<p class="result-ok">✔ すべての通所日に目標の${A.T}人以上を配置しています。</p>`;
+    }
+    const flex = A.rows.filter(r=>r.flex);
+    if(flex.length) h += `<p class="hint">毎日通所可能な利用者（${flex.length}人）は、通える通所日すべてに入れています（人数合わせのために休みにはしません）。</p>`;
+  }
+  const short = A.rows.filter(r=>r.diff!==null && r.diff<0);
+  if(short.length){
+    h += `<p class="result-ng">予定どおりに入れられなかった利用者：${short.length}人</p>`;
+    h += '<div class="list-wrap"><table class="list"><tr><th>名字</th><th>目標</th><th>割り振り</th><th>不足</th><th>理由</th></tr>';
+    for(const r of short) h += `<tr><td>${esc(r.name)}${r.flex?'<br><span class="hint">毎日通所可能</span>':''}</td><td class="num">${r.target}日</td><td class="num">${r.assigned}日</td><td class="num" style="color:var(--bad);font-weight:bold">${-r.diff}日</td><td>${esc(r.reason)}</td></tr>`;
+    h += '</table></div>';
+  }else{
+    h += '<p class="result-ok">✔ 全員が予定どおり配置されています（毎日通所可能な人は通える日すべて、日数指定の人は希望日数）。</p>';
+  }
+  const over = A.rows.filter(r=>r.diff!==null && r.diff>0);
+  if(over.length) h += `<p class="hint">目標より多く入っている利用者：${over.map(r=>`${esc(r.name)}（+${r.diff}）`).join('、')}</p>`;
+  document.getElementById('report').innerHTML = h;
+}
+
+function renderUsers(){
+  const ym = state.currentYM;
+  const allSel = state.users.length && state.users.every(u=>isSelected(u.id));
+  let h = `<tr><th style="width:56px;text-align:center"><input type="checkbox" class="sel" id="selHead" title="全員選択／解除" ${allSel?'checked':''}></th><th>名字</th><th>通所希望日数</th><th>${ymLabel(ym)}の目標</th><th>通所できない曜日</th><th>個別の不可日（${ymLabel(ym)}）</th><th>状態</th><th>操作</th></tr>`;
+  if(!state.users.length) h += '<tr><td colspan="8">利用者がいません。「＋ 利用者を追加」を押してください。</td></tr>';
+  state.users.forEach((u,i)=>{
+    const ngd = u.ngDates.filter(s=>s.startsWith(ym+'-')).map(s=>Number(s.slice(8))+'日');
+    const other = u.ngDates.length - ngd.length;
+    h += `<tr><td style="text-align:center"><input type="checkbox" class="sel" data-sel="${u.id}" ${isSelected(u.id)?'checked':''}></td><td><b>${esc(u.name)}</b></td>
+      <td>${u.desired===null?'<span class="hint">毎日通所可能</span>':u.desired+'日'}</td>
+      <td class="num">${targetOf(u,ym)}日</td>
+      <td>${u.ngWeekdays.length?u.ngWeekdays.slice().sort().map(w=>WD[w]).join('・'):'<span class="hint">なし</span>'}</td>
+      <td>${ngd.length?ngd.join('・'):'<span class="hint">なし</span>'}${other?`<span class="hint">（他の月 ${other}件）</span>`:''}</td>
+      <td><span class="badge ${u.active?'on':'off'}">${u.active?'有効':'無効'}</span></td>
+      <td style="white-space:nowrap"><button class="small" data-pcal="${u.id}">カレンダー</button> <button class="small" data-edit="${u.id}">編集</button>
+        <button class="small" data-up="${i}" ${i===0?'disabled':''}>↑</button>
+        <button class="small" data-down="${i}" ${i===state.users.length-1?'disabled':''}>↓</button>
+        <button class="small danger" data-del="${u.id}">削除</button></td></tr>`;
+  });
+  document.getElementById('userTable').innerHTML = h;
+  document.getElementById('usersHint').textContent =
+    '利用者の情報は翌月以降も自動で引き継がれます。「通所希望日数」が空欄の人は「毎日通所可能」として、通える通所日すべてに入ります（日曜・祝日・指定外の土曜・本人の不可曜日は除く）。';
+  updateSelCount();
+}
+function updateSelCount(){
+  const n = state.selected.length;
+  const t = `選択中：${n}人 ／ ${state.users.length}人`;
+  const a = document.getElementById('selCount'); if(a) a.textContent = t;
+  const b = document.getElementById('pmCount'); if(b) b.textContent = t;
+}
+function setSelected(id, on){
+  const s = new Set(state.selected);
+  on ? s.add(id) : s.delete(id);
+  state.selected = state.users.map(u=>u.id).filter(x=>s.has(x));   // 並びは利用者一覧の順
+  save();
+}
+
+/* ---------- 通所日の設定（月ごと） ---------- */
+function renderCal(){
+  const ym = state.currentYM, D = daysIn(ym);
+  document.getElementById('calTitle').textContent = `${ymLabel(ym)}の通所日の設定`;
+  const cw = (state.closedWeekdays||[]).filter(w=>w>=1&&w<=5).map(w=>WD[w]);
+  const ow = [1,2,3,4,5].filter(w=>!(state.closedWeekdays||[]).includes(w)).map(w=>WD[w]);
+  document.getElementById('calIntro').textContent = `${ow.join('・')}曜は通所日、日曜・祝日${cw.length?'・'+cw.join('・')+'曜（休業日）':''}は休みです（祝日は自動で判定します）。`;
+  const offset = (weekday(ym,1)+6)%7;           // 月曜はじまり
+  const head = ['月','火','水','木','金','土','日'];
+  let h = '<tr>' + head.map((w,i)=>`<th class="${i===5?'sat':i===6?'sun':''}">${w}</th>`).join('') + '</tr><tr>';
+  for(let i=0;i<offset;i++) h += '<td class="out"></td>';
+  for(let d=1; d<=D; d++){
+    const info = dayInfo(ym,d), w = weekday(ym,d);
+    let body = `<div class="dn">${d}</div><div class="lb">${esc(info.label || '通所日')}</div>`;
+    if(info.kind==='hol' || info.kind==='wclosed'){ /* 祝日・休業曜日は休み固定 */ }
+    else if(w===6) body += `<label class="ck"><input type="checkbox" data-sat="${d}" ${info.open?'checked':''}>通所日にする</label>`;
+    else if(w!==0) body += `<label class="ck"><input type="checkbox" data-closed="${d}" ${info.kind==='closed'?'checked':''}>休業日にする</label>`;
+    h += `<td class="k-${info.kind}">${body}</td>`;
+    if((offset+d)%7===0 && d<D) h += '</tr><tr>';
+  }
+  const tail = (7 - (offset+D)%7) % 7;
+  for(let i=0;i<tail;i++) h += '<td class="out"></td>';
+  h += '</tr>';
+  document.getElementById('mcal').innerHTML = h;
+
+  const open = openDays(ym);
+  const hols = []; for(let d=1; d<=D; d++){ const n=holidayName(ym,d); if(n) hols.push(`${d}日（${WD[weekday(ym,d)]}）${n}`); }
+  document.getElementById('calSummary').innerHTML =
+    `<div>通所日 <b>${open.length}</b> 日</div><div>うち土曜 <b>${open.filter(d=>weekday(ym,d)===6).length}</b> 日</div>` +
+    `<div>1か月の総定員 <b>${open.length*state.capacity}</b> 人日</div>` +
+    `<div>祝日：${hols.length?esc(hols.join('、')):'なし'}</div>`;
+  const m = state.months[ym];
+  document.getElementById('calNotice').innerHTML = m && Object.values(m.assign).some(a=>a.length)
+    ? '<div class="notice">この月はシフト作成済みです。通所日を変更したら、「シフト表」で<b>自動シフト作成</b>をやり直してください。</div>' : '';
+}
+function setCal(ym, field, d, on){
+  const c = state.cal[ym] || (state.cal[ym] = {sat:[], closed:[]});
+  const s = new Set(c[field]); on ? s.add(d) : s.delete(d);
+  c[field] = [...s].sort((a,b)=>a-b);
+  save(); renderCal();
+}
+
+function renderSettings(){
+  document.getElementById('capInput').value = state.capacity;
+  document.getElementById('dtInput').value = state.dailyTarget;
+  document.getElementById('cwSel').innerHTML = [1,2,3,4,5].map(w=>
+    `<label class="${state.closedWeekdays.includes(w)?'checked':''}"><input type="checkbox" data-cw="${w}" ${state.closedWeekdays.includes(w)?'checked':''}>${WD[w]}</label>`).join('');
+  const yms = Object.keys(state.months).sort().reverse();
+  let h = '<tr><th>年月</th><th>通所人数（延べ）</th><th>作成日時</th><th>操作</th></tr>';
+  if(!yms.length) h += '<tr><td colspan="4">保存されたシフトはまだありません。</td></tr>';
+  for(const ym of yms){
+    const m = state.months[ym];
+    const total = Object.values(m.assign).reduce((s,a)=>s+a.length,0);
+    const t = m.generatedAt ? new Date(m.generatedAt).toLocaleString('ja-JP') : '－';
+    h += `<tr><td><b>${ymLabel(ym)}</b></td><td class="num">${total}人日</td><td>${t}</td>
+      <td><button class="small" data-open="${ym}">表示</button> <button class="small danger" data-delm="${ym}">削除</button></td></tr>`;
+  }
+  document.getElementById('monthTable').innerHTML = h;
+}
+
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.style.display = 'block';
+  clearTimeout(toast._t); toast._t = setTimeout(()=>t.style.display='none', 3000);
+}
+
+/* =========================================================
+   操作
+   ========================================================= */
+function snapshotNames(ym){
+  const m = state.months[ym]; if(!m) return;
+  for(const u of state.users) m.names[u.id] = u.name;
+}
+
+function autoCreate(){
+  const ym = state.currentYM, m = state.months[ym];
+  if(!state.users.some(u=>u.active)){ alert('有効な利用者がいません。先に「利用者管理」で登録してください。'); return; }
+  if(m){
+    const manual = Object.values(m.manual).reduce((s,a)=>s+a.length,0);
+    const msg = manual
+      ? `${ymLabel(ym)}のシフトを作り直します。\n\n手動で修正した ${manual} か所はすべて上書きされます。\nよろしいですか？`
+      : `${ymLabel(ym)}のシフトはすでに作成されています。作り直しますか？`;
+    if(!confirm(msg)) return;
+  }
+  const assign = generateShift(ym);
+  const keepNotes = (state.months[ym] && state.months[ym].notes) || {};
+  state.months[ym] = {assign, manual:{}, names:{}, notes:keepNotes, generatedAt:Date.now()};
+  snapshotNames(ym);
+  save();
+  render();
+  const A = analyze(ym);
+  const short = A.rows.filter(r=>r.diff!==null && r.diff<0).length;
+  toast(A.errors.length ? '⚠ 定員超過があります。確認してください' :
+        short ? `作成しました（目標未達 ${short}人：理由は下に表示）` : '作成しました。全員が目標日数を満たしています');
+}
+
+function toggleCell(uid, d){
+  const ym = state.currentYM, cap = state.capacity;
+  if(!state.months[ym]) state.months[ym] = {assign:{}, manual:{}, names:{}, generatedAt:null};
+  const m = state.months[ym];
+  const arr = m.assign[uid] || [];
+  const set = new Set(arr);
+  const u = findUser(uid);
+  if(set.has(d)){
+    set.delete(d);
+  }else{
+    const info = dayInfo(ym,d);
+    if(!info.open){
+      alert(`${d}日（${WD[weekday(ym,d)]}）は事業所の休み（${info.label}）のため、通所にできません。` +
+            (weekday(ym,d)===6 ? '\n土曜日を通所日にするには「通所日の設定」でチェックを入れてください。' : ''));
+      return;
+    }
+    const A = analyze(ym);
+    if(A.cnt[d] >= cap){ alert(`${d}日（${WD[weekday(ym,d)]}）はすでに定員${cap}人に達しているため、追加できません。\n先に他の人を休みにしてください。`); return; }
+    if(u && isNG(u,ym,d) && !confirm(`${u.name}さんは${d}日（${WD[weekday(ym,d)]}）は通所不可に設定されています。\nそれでも通所にしますか？`)) return;
+    set.add(d);
+  }
+  m.assign[uid] = [...set].sort((a,b)=>a-b);
+  const man = new Set(m.manual[uid] || []);
+  man.add(d);
+  m.manual[uid] = [...man];
+  snapshotNames(ym);
+  save();
+  renderShift();
+  if(shiftView==='person') renderPerson();
+}
+
+/* ---------- 利用者編集 ---------- */
+let editing = null, calYM = null;
+function openUserModal(id){
+  const u = id ? findUser(id) : null;
+  editing = u ? JSON.parse(JSON.stringify(u)) : {id:null, name:'', desired:null, ngWeekdays:[], ngDates:[], active:true};
+  calYM = state.currentYM;
+  document.getElementById('umTitle').textContent = u ? '利用者の編集' : '利用者の追加';
+  document.getElementById('umName').value = editing.name;
+  document.getElementById('umDesired').value = editing.desired===null ? '' : editing.desired;
+  document.getElementById('umDesiredHint').textContent =
+    '空欄にすると「毎日通所可能」になり、通える通所日すべてに入ります。月15日など決まっている場合は数字を入れてください。';
+  document.getElementById('umActive').checked = editing.active;
+  renderModalParts();
+  document.getElementById('userModal').classList.add('show');
+  setTimeout(()=>document.getElementById('umName').focus(), 50);
+}
+function renderModalParts(){
+  document.getElementById('umWd').innerHTML = WD.map((w,i)=>
+    `<label class="${editing.ngWeekdays.includes(i)?'checked':''}"><input type="checkbox" data-wd="${i}" ${editing.ngWeekdays.includes(i)?'checked':''}>${w}</label>`).join('');
+  const D = daysIn(calYM), first = weekday(calYM,1);
+  document.getElementById('umCalLabel').textContent = ymLabel(calYM);
+  let h = '<tr>' + WD.map((w,i)=>`<th class="${i===0?'sun':i===6?'sat':''}">${w}</th>`).join('') + '</tr><tr>';
+  for(let i=0;i<first;i++) h += '<td></td>';
+  for(let d=1; d<=D; d++){
+    const wd = weekday(calYM,d);
+    const sel = editing.ngDates.includes(dateStr(calYM,d));
+    const wng = editing.ngWeekdays.includes(wd);
+    const info = dayInfo(calYM,d);
+    const cl = !info.open && !sel ? 'closedday' : (wng&&!sel?'wdng':'');
+    h += `<td class="d ${sel?'sel':''} ${cl}" data-cd="${d}" title="${!info.open?'事業所の休み：'+esc(info.label):(wng?'曜日で通所不可':'')}">${d}</td>`;
+    if(wd===6 && d<D) h += '</tr><tr>';
+  }
+  h += '</tr>';
+  document.getElementById('umCal').innerHTML = h;
+  const list = editing.ngDates.slice().sort();
+  document.getElementById('umChips').innerHTML = list.length
+    ? list.map(s=>{ const [y,m,d]=s.split('-').map(Number); return `<span class="chip">${y}/${m}/${d}<button data-rmd="${s}" title="解除">✕</button></span>`; }).join('')
+    : '<span class="hint">個別の不可日はありません</span>';
+}
+function saveUserModal(){
+  const name = document.getElementById('umName').value.trim();
+  if(!name){ alert('名字を入力してください。'); return; }
+  if(state.users.some(u=>u.name===name && u.id!==editing.id) && !confirm(`「${name}」はすでに登録されています。同じ名字で登録しますか？\n（区別するため「佐藤A」のようにすると分かりやすくなります）`)) return;
+  const dv = document.getElementById('umDesired').value.trim();
+  let desired = null;
+  if(dv!==''){
+    desired = parseInt(dv,10);
+    if(isNaN(desired) || desired<0 || desired>31){ alert('通所希望日数は0〜31の数字で入力してください。'); return; }
+  }
+  editing.name = name; editing.desired = desired;
+  editing.active = document.getElementById('umActive').checked;
+  if(editing.id){
+    const i = state.users.findIndex(u=>u.id===editing.id);
+    state.users[i] = editing;
+  }else{
+    editing.id = newId();
+    state.users.push(editing);
+  }
+  save();
+  closeUserModal();
+  render();
+  toast(`${name}さんを保存しました`);
+}
+function closeUserModal(){ document.getElementById('userModal').classList.remove('show'); editing=null; }
+
+function deleteUser(id){
+  const u = findUser(id); if(!u) return;
+  if(!confirm(`${u.name}さんを削除しますか？\n\n今月以降のシフトからも外れます（過去の月のシフト表には名前が残ります）。\n一時的に休む場合は「編集」で「有効」のチェックを外す方法もあります。`)) return;
+  const now = todayYM();
+  for(const ym in state.months){
+    const m = state.months[ym];
+    m.names[id] = u.name;
+    if(ym >= now){ delete m.assign[id]; delete m.manual[id]; }
+  }
+  state.users = state.users.filter(x=>x.id!==id);
+  state.selected = state.selected.filter(x=>x!==id);
+  save(); render();
+}
+
+/* =========================================================
+   PNG画像出力（シフト表だけをキャンバスに描画）
+   ========================================================= */
+const PNG_FONT = '"Meiryo","Yu Gothic UI","Yu Gothic","Hiragino Sans",sans-serif';
+function hasShift(ym){ const m=state.months[ym]; return !!(m && Object.values(m.assign).some(a=>a.length)); }
+function saveCanvas(cv, fname){
+  return new Promise(res=>cv.toBlob(blob=>{
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = fname;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href), 10000);
+    res();
+  }, 'image/png'));
+}
+
+function exportTablePNG(){
+  const ym = state.currentYM;
+  if(!hasShift(ym)){ alert('この月のシフトがまだありません。先に「自動シフト作成」を行ってください。'); return; }
+  const A = analyze(ym), D = daysIn(ym), cap = state.capacity;
+  const info = []; for(let d=1; d<=D; d++) info[d] = dayInfo(ym,d);
+  const rows = A.rows.filter(r=>r.assigned>0 || (r.user && r.user.active));
+  const [y,mo] = ymParts(ym);
+  const F = '"Meiryo","Yu Gothic UI","Yu Gothic","Hiragino Sans",sans-serif';
+  const S = 2;                                   // 高解像度（2倍）で出力
+  const cv = document.createElement('canvas'), g = cv.getContext('2d');
+
+  g.font = `bold 18px ${F}`;
+  let nameW = 96;
+  for(const r of rows) nameW = Math.max(nameW, Math.ceil(g.measureText(r.name).width) + 24);
+  const pad=22, titleH=62, h1=30, h2=26, rowH=32, dayW=35, extra=[60,60,54], footH=32, legH=44;
+  const tableW = nameW + D*dayW + extra.reduce((a,b)=>a+b,0);
+  const W = pad*2 + tableW;
+  const H = pad + titleH + h1 + h2 + rows.length*rowH + footH*2 + legH + pad/2;
+  cv.width = W*S; cv.height = H*S; g.scale(S,S);
+
+  const fill = (x,y,w,h,c)=>{ g.fillStyle=c; g.fillRect(x,y,w,h); };
+  const text = (s,x,y,o={})=>{
+    g.font = `${o.bold?'bold ':''}${o.size||16}px ${F}`;
+    g.fillStyle = o.color||'#222'; g.textAlign = o.align||'center'; g.textBaseline='middle';
+    g.fillText(s,x,y);
+  };
+  const box = (x,y,w,h)=>{ g.strokeStyle='#a9b6c4'; g.lineWidth=1; g.strokeRect(x+0.5,y+0.5,w,h); };
+  const wdc = d=>weekday(ym,d);
+  const headBg = d=>!info[d].open?'#d6d6d6':wdc(d)===6?'#dde9ff':'#eef2f7';
+  const bodyBg = d=>!info[d].open?'#dedede':wdc(d)===6?'#f5f9ff':'#ffffff';
+
+  fill(0,0,W,H,'#ffffff');
+  text(`${y}年${mo}月　通所シフト表`, pad, pad+22, {size:28, bold:true, align:'left', color:'#2f5d8a'});
+  const nowD = new Date();
+  text(`定員 ${cap}人／日　　作成 ${nowD.getMonth()+1}月${nowD.getDate()}日`, W-pad, pad+24, {size:15, align:'right', color:'#555'});
+
+  let x0 = pad, yy = pad + titleH;
+  // 見出し
+  fill(x0,yy,nameW,h1+h2,'#eef2f7'); box(x0,yy,nameW,h1+h2);
+  text('名字', x0+nameW/2, yy+(h1+h2)/2, {size:17, bold:true});
+  for(let d=1; d<=D; d++){
+    const x = x0 + nameW + (d-1)*dayW;
+    const col = (wdc(d)===0||info[d].kind==='hol')?'#c0392b':wdc(d)===6?'#2456a6':'#222';
+    fill(x,yy,dayW,h1,headBg(d)); box(x,yy,dayW,h1); text(String(d), x+dayW/2, yy+h1/2, {size:17, bold:true, color:col});
+    fill(x,yy+h1,dayW,h2,headBg(d)); box(x,yy+h1,dayW,h2); text(info[d].kind==='hol'?'祝':WD[wdc(d)], x+dayW/2, yy+h1+h2/2, {size:15, color:col});
+  }
+  let ex = x0 + nameW + D*dayW;
+  ['予定','目標','差'].forEach((t,i)=>{ fill(ex,yy,extra[i],h1+h2,'#eef2f7'); box(ex,yy,extra[i],h1+h2); text(t, ex+extra[i]/2, yy+(h1+h2)/2, {size:16, bold:true}); ex+=extra[i]; });
+  yy += h1 + h2;
+
+  // 本体
+  for(const r of rows){
+    fill(x0,yy,nameW,rowH,'#fff'); box(x0,yy,nameW,rowH);
+    text(r.name, x0+12, yy+rowH/2, {size:18, bold:true, align:'left'});
+    for(let d=1; d<=D; d++){
+      const x = x0 + nameW + (d-1)*dayW;
+      const on = r.days.has(d), ng = info[d].open && r.user && isNG(r.user,ym,d);
+      fill(x,yy,dayW,rowH, on?'#cfe3f7':(ng?'#efefef':bodyBg(d)));
+      box(x,yy,dayW,rowH);
+      if(on) text('○', x+dayW/2, yy+rowH/2+1, {size:19, bold:true, color:'#234a70'});
+    }
+    let ex2 = x0 + nameW + D*dayW;
+    const vals = [String(r.assigned), r.target===null?'－':String(r.target), r.diff===null?'－':(r.diff>0?'+'+r.diff:String(r.diff))];
+    vals.forEach((v,i)=>{ fill(ex2,yy,extra[i],rowH,'#f7f9fb'); box(ex2,yy,extra[i],rowH);
+      text(v, ex2+extra[i]/2, yy+rowH/2, {size:17, bold:true, color:(i===2&&r.diff<0)?'#c0392b':'#222'}); ex2+=extra[i]; });
+    yy += rowH;
+  }
+
+  // 人数・空き
+  const foot = (label, valFn, clsFn)=>{
+    fill(x0,yy,nameW,footH,'#e3eaf2'); box(x0,yy,nameW,footH); text(label, x0+12, yy+footH/2, {size:17, bold:true, align:'left'});
+    for(let d=1; d<=D; d++){
+      const x = x0 + nameW + (d-1)*dayW;
+      if(!info[d].open && !A.cnt[d]){
+        fill(x,yy,dayW,footH,'#d6d6d6'); box(x,yy,dayW,footH);
+        text(label==='人数'?'休':'－', x+dayW/2, yy+footH/2, {size:15, color:'#777'}); continue;
+      }
+      const v = valFn(d), c = clsFn(d);
+      fill(x,yy,dayW,footH, c==='full'?'#ffcccc':c==='near'?'#fff1bf':'#eef2f7'); box(x,yy,dayW,footH);
+      text(String(v), x+dayW/2, yy+footH/2, {size:17, bold:true, color:c==='full'?'#c0392b':'#222'});
+    }
+    let ex3 = x0 + nameW + D*dayW;
+    extra.forEach(w=>{ fill(ex3,yy,w,footH,'#eef2f7'); box(ex3,yy,w,footH); ex3+=w; });
+    yy += footH;
+  };
+  foot('人数', d=>A.cnt[d], d=>A.cnt[d]>=cap?'full':A.cnt[d]>=cap-2?'near':'');
+  foot('空き', d=>cap-A.cnt[d], d=>cap-A.cnt[d]<=0?'full':cap-A.cnt[d]<=2?'near':'');
+
+  text('○＝通所　　濃い灰色の列＝事業所の休み（日曜・祝日・指定外の土曜）　　人数：黄色＝残りわずか／赤＝定員', pad, yy+legH/2+2, {size:15, align:'left', color:'#555'});
+
+  const fname = `${y}年${mo}月シフト.png`;
+  saveCanvas(cv, fname).then(()=>toast(`「${fname}」を保存しました（ダウンロードフォルダ）`));
+}
+
+/* =========================================================
+   カレンダー形式のPNG（月曜はじまり）
+   mode 'all'：全利用者 ／ 'sel'：選択した利用者だけ
+   ※ シフトデータは読むだけで、一切変更しない
+   ========================================================= */
+function buildCalendarCanvases(ym, mode){
+  const D = daysIn(ym), cap = state.capacity, A = analyze(ym);
+  const [y,mo] = ymParts(ym);
+  const F = PNG_FONT;
+  // 対象者（表示順は利用者一覧の順）
+  let rows = A.rows.filter(r=>r.assigned>0);
+  if(mode==='sel'){ const s = new Set(state.selected); rows = rows.filter(r=>s.has(r.id)); }
+  const names = [];                                  // names[d] = その日に通所する対象者の名字
+  for(let d=1; d<=D; d++) names[d] = rows.filter(r=>r.days.has(d)).map(r=>r.name.replace('（削除済）',''));
+  const info = []; for(let d=1; d<=D; d++) info[d] = dayInfo(ym,d);
+
+  // 文字の大きさ：人数が少ないほど大きく（最小でも22px）
+  const maxN = Math.max(1, ...names.slice(1).map(a=>a.length));
+  const fs = maxN<=3 ? 30 : maxN<=8 ? 26 : 22;
+  const meas = document.createElement('canvas').getContext('2d');
+  meas.font = `bold ${fs}px ${F}`;
+  let nameW = 0; for(const r of rows) nameW = Math.max(nameW, meas.measureText(r.name).width);
+  nameW = Math.ceil(nameW) + 14;
+  const perLine = Math.max(1, Math.min(maxN, mode==='sel' && maxN<=3 ? maxN : 3));
+  const cellW = Math.max(mode==='sel' ? 170 : 200, perLine*nameW + 16);
+  const lineH = fs + 10, headH = 64, pad = 24;
+  const W = pad*2 + cellW*7;
+
+  const offset = (weekday(ym,1)+6)%7;
+  const weeks = []; // 各週の日付（null は月外）
+  let cur = [];
+  for(let i=0;i<offset;i++) cur.push(null);
+  for(let d=1; d<=D; d++){ cur.push(d); if(cur.length===7){ weeks.push(cur); cur=[]; } }
+  if(cur.length){ while(cur.length<7) cur.push(null); weeks.push(cur); }
+  const weekH = weeks.map(wk=>{
+    let lines = 1;
+    for(const d of wk) if(d && info[d].open) lines = Math.max(lines, Math.ceil(names[d].length/perLine));
+    return headH + lines*lineH + 14;
+  });
+
+  // 縦に長くなりすぎる場合は週単位で分割（1枚あたり約3200px以内）
+  const titleH = 92, wdH = 44, footH = 70, MAXH = 3200;
+  const parts = []; let part = [], h = 0;
+  weeks.forEach((wk,i)=>{
+    if(part.length && h + weekH[i] > MAXH - titleH - wdH - footH){ parts.push(part); part=[]; h=0; }
+    part.push(i); h += weekH[i];
+  });
+  if(part.length) parts.push(part);
+
+  const overDays = [], closedAssigned = [];
+  for(let d=1; d<=D; d++){ if(A.cnt[d]>cap) overDays.push(d); if(!info[d].open && A.cnt[d]>0) closedAssigned.push(d); }
+
+  return parts.map((wkIdx, pi)=>{
+    const bodyH = wkIdx.reduce((s,i)=>s+weekH[i],0);
+    const H = pad + titleH + wdH + bodyH + footH;
+    const S = 2;
+    const cv = document.createElement('canvas'); cv.width = W*S; cv.height = H*S;
+    const g = cv.getContext('2d'); g.scale(S,S);
+    const fill=(x,yy,w,hh,c)=>{ g.fillStyle=c; g.fillRect(x,yy,w,hh); };
+    const text=(s,x,yy,o={})=>{ g.font=`${o.bold?'bold ':''}${o.size||16}px ${F}`; g.fillStyle=o.color||'#222'; g.textAlign=o.align||'left'; g.textBaseline='middle'; g.fillText(s,x,yy); };
+    const line=(x1,y1,x2,y2,c,w)=>{ g.strokeStyle=c; g.lineWidth=w; g.beginPath(); g.moveTo(x1,y1); g.lineTo(x2,y2); g.stroke(); };
+
+    fill(0,0,W,H,'#fff');
+    const sub = mode==='sel' ? '' : '（全体）';
+    text(`${y}年${mo}月　通所シフト${sub}${parts.length>1?`　${pi+1}/${parts.length}`:''}`, pad, pad+30, {size:38, bold:true, color:'#2f5d8a'});
+    text(`定員 ${cap}人／日`, W-pad, pad+34, {size:18, color:'#555', align:'right'});
+    let yy = pad + titleH;
+    const wdNames = ['月','火','水','木','金','土','日'];
+    wdNames.forEach((w,i)=>{
+      const x = pad + i*cellW;
+      fill(x,yy,cellW,wdH, i===5?'#dde9ff':i===6?'#ffe1e1':'#eef2f7');
+      text(w, x+cellW/2, yy+wdH/2, {size:22, bold:true, align:'center', color:i===5?'#2456a6':i===6?'#c0392b':'#222'});
+    });
+    yy += wdH;
+    const top = pad + titleH;
+
+    for(const wi of wkIdx){
+      const wk = weeks[wi], rh = weekH[wi];
+      wk.forEach((d,i)=>{
+        const x = pad + i*cellW;
+        if(!d){ fill(x,yy,cellW,rh,'#f6f6f6'); return; }
+        const inf = info[d], wd = weekday(ym,d);
+        const red = inf.kind==='hol' || wd===0;
+        const bg = inf.open ? (wd===6 ? '#edf4ff' : '#ffffff') : (red ? '#fdeeee' : '#eeeeee');
+        fill(x,yy,cellW,rh,bg);
+        // 日付
+        text(String(d), x+10, yy+22, {size:28, bold:true, color: red?'#c0392b': wd===6?'#2456a6':'#222'});
+        // ラベル（祝日名／土曜通所日／休み）
+        let lab = '', labColor = '#555';
+        if(inf.kind==='hol'){ lab = inf.label; labColor = '#c0392b'; }
+        else if(inf.kind==='satopen'){ lab = '土曜通所日'; labColor = '#2456a6'; }
+        else if(inf.kind==='closed'){ lab = '休業日'; }
+        if(lab) text(lab, x+10, yy+50, {size:15, bold:true, color:labColor});
+        if(inf.open){
+          // 人数（全体は定員と比較、選択は対象者の人数＋全体人数）
+          const c = A.cnt[d];
+          if(mode==='all'){
+            const col = c>cap ? '#c0392b' : c>=cap-2 ? '#b07800' : '#2f5d8a';
+            text(`${c}人`, x+cellW-10, yy+24, {size:24, bold:true, align:'right', color:col});
+            text(`/${cap}`, x+cellW-10, yy+50, {size:14, align:'right', color:'#777'});
+          }else{
+            if(names[d].length) text(`${names[d].length}人`, x+cellW-10, yy+24, {size:22, bold:true, align:'right', color:'#2f5d8a'});
+            text(`全体${c}人`, x+cellW-10, yy+50, {size:14, align:'right', color:'#777'});
+          }
+          names[d].forEach((n,k)=>{
+            const col = k % perLine, row = Math.floor(k / perLine);
+            text(n, x + 10 + col*nameW, yy + headH + row*lineH + lineH/2, {size:fs, bold:true, color:'#1d1d1d'});
+          });
+        }else{
+          text('休み', x+cellW/2, yy+headH + (rh-headH)/2 - 4, {size:26, bold:true, align:'center', color: red?'#d77':'#999'});
+        }
+      });
+      line(pad, yy, pad+cellW*7, yy, '#8a9bb0', 1.5);
+      yy += rh;
+    }
+    // 罫線（日付ごとの区切りをはっきり）
+    line(pad, yy, pad+cellW*7, yy, '#8a9bb0', 1.5);
+    for(let i=0;i<=7;i++) line(pad+i*cellW, top, pad+i*cellW, yy, '#8a9bb0', 1.5);
+    g.strokeStyle='#2f5d8a'; g.lineWidth=3; g.strokeRect(pad, top, cellW*7, yy-top);
+
+    // 下部の注記と定員チェック
+    const ok = !overDays.length && !closedAssigned.length;
+    const chk = ok ? `✔ すべての日で通所人数は定員${cap}人以内です` : `⚠ 定員超過または休みの日への割り当てがあります（${[...overDays,...closedAssigned].join('・')}日）`;
+    text(chk, pad, yy+24, {size:18, bold:true, color: ok?'#1e7d3a':'#c0392b'});
+    text('日曜・祝日は休み／土曜は青い「土曜通所日」の日のみ通所', pad, yy+52, {size:16, color:'#555'});
+    return cv;
+  });
+}
+
+/* =========================================================
+   個別カレンダー（1人1枚・月曜はじまり・〇で通所日を表示）
+   画面表示とPNG保存で同じ描画を使う
+   ========================================================= */
+const PC = {W:1120, padX:14, headH:96, wdH:30, cellH:86, S:2};
+function personCalendarLayout(ym){
+  const D = daysIn(ym), offset = (weekday(ym,1)+6)%7;
+  const weeks = Math.ceil((offset + D)/7);
+  const cellW = (PC.W - PC.padX*2)/7;
+  const top = PC.headH + PC.wdH;
+  return {D, offset, weeks, cellW, top, H: top + weeks*PC.cellH + 14};
+}
+function drawPersonCalendar(cv, ym, uid){
+  const L = personCalendarLayout(ym), F = PNG_FONT;
+  const [y, mo] = ymParts(ym);
+  const u = findUser(uid);
+  const m = state.months[ym];
+  const days = new Set(m && m.assign[uid] ? m.assign[uid] : []);
+  cv.width = PC.W*PC.S; cv.height = L.H*PC.S;
+  const g = cv.getContext('2d'); g.setTransform(PC.S,0,0,PC.S,0,0);
+  const text=(s,x,yy,o={})=>{ g.font=`${o.bold?'bold ':''}${o.size||16}px ${F}`; g.fillStyle=o.color||'#222'; g.textAlign=o.align||'left'; g.textBaseline=o.base||'middle'; g.fillText(s,x,yy); };
+  const SAT = '#63b7c1', SUN = '#f9933c';
+
+  g.fillStyle = '#fff'; g.fillRect(0,0,PC.W,L.H);
+  // 年・月（大きく）と利用者名
+  text(String(y), PC.padX+8, 50, {size:40, color:'#2f7f8a'});
+  text(`${mo} 月`, PC.padX+150, 50, {size:44, bold:true, color:'#1f2d3a'});
+  text(`${u ? u.name : (m && m.names[uid]) || ''}さん`, PC.W-PC.padX-8, 52, {size:30, bold:true, align:'right', color:'#222'});
+
+  // 曜日見出し
+  const wdn = ['月曜日','火曜日','水曜日','木曜日','金曜日','土曜日','日曜日'];
+  const x0 = PC.padX, cw = L.cellW;
+  // 土曜・日曜の列は全体を色付け
+  g.fillStyle = SAT; g.fillRect(x0+5*cw, PC.headH, cw, PC.wdH + L.weeks*PC.cellH);
+  g.fillStyle = SUN; g.fillRect(x0+6*cw, PC.headH, cw, PC.wdH + L.weeks*PC.cellH);
+  wdn.forEach((w,i)=>text(w, x0+i*cw+cw/2, PC.headH+PC.wdH/2+1, {size:17, bold:i>=5, align:'center', color:'#222'}));
+  g.strokeStyle = '#222'; g.lineWidth = 2;
+  g.beginPath(); g.moveTo(x0, L.top); g.lineTo(x0+7*cw, L.top); g.stroke();
+
+  // 日付の枠
+  const prevD = daysIn(addMonth(ym,-1));
+  for(let i=0; i<L.weeks*7; i++){
+    const col = i%7, row = Math.floor(i/7);
+    const x = x0 + col*cw, yy = L.top + row*PC.cellH;
+    const d = i - L.offset + 1;
+    const inMonth = d>=1 && d<=L.D;
+    let label;
+    if(inMonth) label = pad2(d);
+    else if(d<1) label = pad2(prevD + d);
+    else label = pad2(d - L.D);
+    let color = '#222';
+    if(!inMonth) color = col>=5 ? 'rgba(255,255,255,.6)' : '#c4ccd4';     // 前月・翌月は薄く
+    else if(holidayName(ym,d)) color = '#d0302a';                          // 祝日は赤字（〇は付けない）
+    text(label, x+cw-10, yy+16, {size:17, align:'right', color});
+    const note = inMonth ? noteOf(ym, uid, d) : '';
+    const on = inMonth && days.has(d) && isOpen(ym,d);
+    const cy = yy + PC.cellH/2 + 12;
+    if(on){
+      // 備考があるときは〇を左に寄せ、右側に小さく備考を書く
+      const cx = note ? x + 34 : x + cw/2;
+      g.strokeStyle = '#111'; g.lineWidth = 3.2;
+      g.beginPath(); g.ellipse(cx, cy, 23, 21, 0, 0, Math.PI*2); g.stroke();
+    }
+    if(note){
+      const left = on ? x + 64 : x + 10, maxW = x + cw - 6 - left;
+      const lines = wrapText(g, note, maxW, `bold 14px ${F}`, 3);
+      const lh = 17, startY = cy - (lines.length-1)*lh/2;
+      lines.forEach((ln,k)=>text(ln, left, startY + k*lh, {size:14, bold:true, color: col>=5 ? '#1a1a1a' : '#3a4a5a'}));
+    }
+  }
+  // 罫線
+  g.strokeStyle = '#c9c9c9'; g.lineWidth = 1;
+  for(let r=1; r<=L.weeks; r++){ const yy = L.top + r*PC.cellH; g.beginPath(); g.moveTo(x0,yy); g.lineTo(x0+7*cw,yy); g.stroke(); }
+  for(let c=1; c<7; c++){ const x = x0 + c*cw; g.beginPath(); g.moveTo(x,L.top); g.lineTo(x,L.top+L.weeks*PC.cellH); g.stroke(); }
+  g.strokeStyle = '#9a9a9a'; g.lineWidth = 1.2;
+  g.strokeRect(x0, L.top, 7*cw, L.weeks*PC.cellH);
+  return L;
+}
+// 文字を幅に合わせて折り返す（最大 maxLines 行、はみ出しは…）
+function wrapText(g, str, maxW, font, maxLines){
+  g.font = font;
+  const lines = []; let cur = '';
+  // 数字・英字のまとまり（「14時」の14 など）は途中で改行しない
+  for(const ch of (String(str).match(/[0-9０-９A-Za-z:：.\-]+|[\s\S]/g) || [])){
+    if(ch === '\n'){ lines.push(cur); cur = ''; continue; }
+    if(cur && g.measureText(cur + ch).width > maxW){ lines.push(cur); cur = ch; }
+    else cur += ch;
+  }
+  if(cur) lines.push(cur);
+  if(lines.length > maxLines){
+    lines.length = maxLines;
+    let l = lines[maxLines-1];
+    while(l && g.measureText(l + '…').width > maxW) l = l.slice(0,-1);
+    lines[maxLines-1] = l + '…';
+  }
+  return lines;
+}
+// 備考（月ごと・利用者ごと・日ごと）。シフトとは別に保存し、自動作成をやり直しても消えない
+function noteOf(ym, uid, d){ const m = state.months[ym]; return (m && m.notes && m.notes[uid] && m.notes[uid][d]) || ''; }
+function setNote(ym, uid, d, text){
+  if(!state.months[ym]) state.months[ym] = {assign:{}, manual:{}, names:{}, notes:{}, generatedAt:null};
+  const m = state.months[ym]; m.notes = m.notes || {};
+  const t = String(text||'').trim();
+  if(t){ (m.notes[uid] = m.notes[uid] || {})[d] = t; }
+  else if(m.notes[uid]){ delete m.notes[uid][d]; if(!Object.keys(m.notes[uid]).length) delete m.notes[uid]; }
+  save();
+}
+
+// 画面上のクリック位置 → 日付
+function personCalendarHit(ym, lx, ly){
+  const L = personCalendarLayout(ym);
+  const col = Math.floor((lx - PC.padX)/L.cellW), row = Math.floor((ly - L.top)/PC.cellH);
+  if(col<0 || col>6 || row<0 || row>=L.weeks) return null;
+  const d = row*7 + col - L.offset + 1;
+  return (d>=1 && d<=L.D) ? d : null;
+}
+
+let shiftView = 'all', pcUserId = null;
+function pcCandidates(){
+  const m = state.months[state.currentYM];
+  return state.users.filter(u=>u.active || (m && (m.assign[u.id]||[]).length));
+}
+function renderPerson(){
+  const list = pcCandidates();
+  if(!list.some(u=>u.id===pcUserId)) pcUserId = list.length ? list[0].id : null;
+  document.getElementById('pcUser').innerHTML = list.map(u=>`<option value="${u.id}" ${u.id===pcUserId?'selected':''}>${esc(u.name)}さん</option>`).join('') || '<option>利用者がいません</option>';
+  const cv = document.getElementById('pcCanvas');
+  if(!pcUserId){ cv.width = 10; cv.height = 10; document.getElementById('pcInfo').textContent=''; return; }
+  drawPersonCalendar(cv, state.currentYM, pcUserId);
+  const u = findUser(pcUserId), ym = state.currentYM;
+  const n = (state.months[ym]?.assign[pcUserId]||[]).length;
+  document.getElementById('pcInfo').textContent = u ? `　${u.name}さん：${ymLabel(ym)}は ${n}日 通所予定（${isFlex(u)?'毎日通所可能':'月'+u.desired+'日'}）` : '';
+}
+function savePersonPNG(uid){
+  const ym = state.currentYM, [y,mo] = ymParts(ym);
+  const u = findUser(uid); if(!u) return Promise.resolve();
+  const cv = document.createElement('canvas');
+  drawPersonCalendar(cv, ym, uid);
+  const safe = u.name.replace(/[\\/:*?"<>|]/g,'');
+  return saveCanvas(cv, `${y}年${mo}月_${safe}.png`).then(()=>`${y}年${mo}月_${safe}.png`);
+}
+async function exportPersonPNGs(ids){
+  if(!hasShift(state.currentYM)){ alert('この月のシフトがまだありません。先に「自動シフト作成」を行ってください。'); return false; }
+  if(!ids.length){ alert('画像に載せる利用者が選ばれていません。チェックボックスで選択してください。'); return false; }
+  for(let i=0;i<ids.length;i++){
+    await savePersonPNG(ids[i]);
+    if(i<ids.length-1) await new Promise(r=>setTimeout(r,600));
+  }
+  toast(`${ids.length}人分の個別カレンダーを保存しました（ダウンロードフォルダ）`);
+  return true;
+}
+
+/* =========================================================
+   シンプルな縦長リスト画像（LINE共有向け）
+   日付 → 「〇 名前さん」だけを表示。選択した利用者のみ。人数などの説明は入れない
+   ========================================================= */
+function buildListCanvases(ym){
+  const D = daysIn(ym), A = analyze(ym);
+  const [, mo] = ymParts(ym);
+  const sel = new Set(state.selected);
+  const rows = A.rows.filter(r=>sel.has(r.id));
+  const groups = [];
+  for(let d=1; d<=D; d++){
+    const names = rows.filter(r=>r.days.has(d)).map(r=>r.name.replace('（削除済）','') + 'さん');
+    if(names.length) groups.push({label:`${mo}月${d}日（${WD[weekday(ym,d)]}）`, names});
+  }
+  const F = PNG_FONT, dateFs = 36, nameFs = 34, dateH = 58, lineH = 50, gap = 26, padX = 44, padY = 40, indent = 28;
+  const meas = document.createElement('canvas').getContext('2d');
+  let maxW = 0;
+  for(const g of groups){
+    meas.font = `bold ${dateFs}px ${F}`; maxW = Math.max(maxW, meas.measureText(g.label).width);
+    meas.font = `${nameFs}px ${F}`;
+    for(const n of g.names) maxW = Math.max(maxW, indent + meas.measureText('〇　' + n).width);
+  }
+  const W = Math.max(620, Math.ceil(maxW) + padX*2);
+  const gh = g => dateH + g.names.length*lineH + gap;
+  // 縦に長くなりすぎる場合は日付の区切りで分割（1枚あたり約3600px以内）
+  const MAXH = 3600, parts = []; let cur = [], h = padY*2;
+  for(const g of groups){
+    if(cur.length && h + gh(g) > MAXH){ parts.push(cur); cur = []; h = padY*2; }
+    cur.push(g); h += gh(g);
+  }
+  if(cur.length) parts.push(cur);
+  const S = 2;
+  return parts.map(list=>{
+    const H = padY*2 + list.reduce((t,g)=>t+gh(g),0) - gap;
+    const cv = document.createElement('canvas'); cv.width = W*S; cv.height = H*S;
+    const g = cv.getContext('2d'); g.scale(S,S);
+    g.fillStyle = '#fff'; g.fillRect(0,0,W,H);
+    g.textBaseline = 'middle'; g.textAlign = 'left';
+    let yy = padY;
+    list.forEach((grp,i)=>{
+      g.font = `bold ${dateFs}px ${F}`; g.fillStyle = '#222';
+      g.fillText(grp.label, padX, yy + dateH/2);
+      yy += dateH;
+      g.font = `${nameFs}px ${F}`; g.fillStyle = '#222';
+      for(const n of grp.names){ g.fillText('〇　' + n, padX + indent, yy + lineH/2); yy += lineH; }
+      if(i < list.length-1){
+        g.strokeStyle = '#d0d0d0'; g.lineWidth = 1.5;
+        g.beginPath(); g.moveTo(padX, yy + gap/2); g.lineTo(W-padX, yy + gap/2); g.stroke();
+      }
+      yy += gap;
+    });
+    return cv;
+  });
+}
+
+async function exportListPNG(){
+  const ym = state.currentYM;
+  if(!hasShift(ym)){ alert('この月のシフトがまだありません。先に「自動シフト作成」を行ってください。'); return false; }
+  if(!state.selected.length){ alert('画像に載せる利用者が選ばれていません。チェックボックスで選択してください。'); return false; }
+  const cvs = buildListCanvases(ym);
+  if(!cvs.length){ alert('選択した利用者は、この月の通所予定がありません。'); return false; }
+  const [y,mo] = ymParts(ym);
+  const base = `${y}年${mo}月_通所シフト`;    // 名字はファイル名に入れない
+  for(let i=0;i<cvs.length;i++){
+    await saveCanvas(cvs[i], cvs.length>1 ? `${base}_${i+1}.png` : `${base}.png`);
+    if(i<cvs.length-1) await new Promise(r=>setTimeout(r,600));
+  }
+  toast(cvs.length>1 ? `画像を${cvs.length}枚に分けて保存しました（ダウンロードフォルダ）` : `「${base}.png」を保存しました（ダウンロードフォルダ）`);
+  return true;
+}
+
+async function exportCalendarPNG(mode){
+  const ym = state.currentYM;
+  if(!hasShift(ym)){ alert('この月のシフトがまだありません。先に「自動シフト作成」を行ってください。'); return false; }
+  if(mode==='sel'){
+    if(!state.selected.length){ alert('画像に載せる利用者が選ばれていません。チェックボックスで選択してください。'); return false; }
+    const A = analyze(ym);
+    const any = A.rows.some(r=>isSelected(r.id) && r.assigned>0);
+    if(!any){ alert('選択した利用者は、この月の通所予定がありません。'); return false; }
+  }
+  const [y,mo] = ymParts(ym);
+  const cvs = buildCalendarCanvases(ym, mode);
+  const base = mode==='sel' ? `${y}年${mo}月_通所シフト_カレンダー` : `${y}年${mo}月_通所シフト_全体`;   // 名字はファイル名に入れない
+  for(let i=0;i<cvs.length;i++){
+    const fname = cvs.length>1 ? `${base}_${i+1}.png` : `${base}.png`;
+    await saveCanvas(cvs[i], fname);
+    if(i<cvs.length-1) await new Promise(r=>setTimeout(r,600));
+  }
+  toast(cvs.length>1 ? `画像を${cvs.length}枚に分けて保存しました（ダウンロードフォルダ）` : `「${base}.png」を保存しました（ダウンロードフォルダ）`);
+  return true;
+}
+
+/* ---------- 画像出力ダイアログ ---------- */
+let pngMode = 'simple';
+function openPngModal(mode){
+  if(!hasShift(state.currentYM)){ alert('この月のシフトがまだありません。先に「自動シフト作成」を行ってください。'); return; }
+  pngMode = mode || pngMode;
+  document.getElementById('pmTitle').textContent = `${ymLabel(state.currentYM)}　PNG画像を出力`;
+  renderPngModal();
+  document.getElementById('pngModal').classList.add('show');
+}
+function renderPngModal(){
+  document.querySelectorAll('#pmOpts input[name=pmode]').forEach(r=>{ r.checked = r.value===pngMode; r.closest('label').classList.toggle('checked', r.checked); });
+  document.getElementById('pmPick').classList.toggle('hidden', !['sel','simple','person'].includes(pngMode));
+  document.getElementById('pmGrid').innerHTML = state.users.filter(u=>u.active || (state.months[state.currentYM]?.assign[u.id]||[]).length).map(u=>
+    `<label><input type="checkbox" data-psel="${u.id}" ${isSelected(u.id)?'checked':''}>${esc(u.name)}</label>`).join('') || '<span class="hint">利用者がいません</span>';
+  updateSelCount();
+  const [y,mo] = ymParts(state.currentYM);
+  const fn = {person:`${y}年${mo}月_利用者名.png（1人1枚）`, simple:`${y}年${mo}月_通所シフト.png`, sel:`${y}年${mo}月_通所シフト_カレンダー.png`, all:`${y}年${mo}月_通所シフト_全体.png`, table:`${y}年${mo}月シフト.png`}[pngMode];
+  document.getElementById('pmFname').textContent = `保存するファイル名：${fn}` + (pngMode==='sel'||pngMode==='simple' ? '（名字はファイル名に入りません）' : '');
+}
+
+/* =========================================================
+   バックアップ・復元
+   ========================================================= */
+function backup(){
+  const d = new Date();
+  const fname = `シフトバックアップ_${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}.json`;
+  const blob = new Blob([JSON.stringify(state, null, 1)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = fname;
+  document.body.appendChild(a); a.click(); a.remove();
+  toast(`「${fname}」を保存しました`);
+}
+function restore(file){
+  const r = new FileReader();
+  r.onload = ()=>{
+    try{
+      const s = JSON.parse(r.result);
+      if(!Array.isArray(s.users) || typeof s.months!=='object') throw new Error('形式が違います');
+      if(!confirm(`バックアップ（利用者 ${s.users.length}人、シフト ${Object.keys(s.months).length}か月分）で、現在のデータを置き換えます。よろしいですか？`)) return;
+      state = s; normalize(); save(); render();
+      toast('復元しました');
+    }catch(e){ alert('このファイルは復元できません。シフトのバックアップファイル（.json）を選んでください。'); }
+  };
+  r.readAsText(file);
+}
+
+/* =========================================================
+   イベント
+   ========================================================= */
+document.querySelectorAll('nav.tabs button').forEach(b=>b.onclick=()=>{ currentTab=b.dataset.tab; render(); });
+document.getElementById('prevM').onclick = ()=>{ state.currentYM = addMonth(state.currentYM,-1); save(); render(); };
+document.getElementById('nextM').onclick = ()=>{ state.currentYM = addMonth(state.currentYM,1); save(); render(); };
+document.getElementById('ymPick').onchange = e=>{ if(e.target.value){ state.currentYM = e.target.value; save(); render(); } };
+document.getElementById('btnAuto').onclick = autoCreate;
+document.getElementById('btnPng').onclick = ()=>openPngModal();
+document.getElementById('btnUsers2').onclick = ()=>{ currentTab='users'; render(); };
+document.getElementById('btnCal2').onclick = ()=>{ currentTab='cal'; render(); };
+
+// 全体シフト／個別カレンダー
+document.querySelectorAll('.viewtabs button').forEach(b=>b.onclick=()=>{ shiftView=b.dataset.view; render(); });
+document.getElementById('pcUser').onchange = e=>{ pcUserId = e.target.value; renderPerson(); };
+const pcStep = k=>{ const l=pcCandidates(); if(!l.length) return; const i=l.findIndex(u=>u.id===pcUserId); pcUserId=l[(i+k+l.length)%l.length].id; renderPerson(); };
+document.getElementById('pcPrev').onclick = ()=>pcStep(-1);
+document.getElementById('pcNext').onclick = ()=>pcStep(1);
+document.getElementById('pcSave').onclick = ()=>{
+  if(!hasShift(state.currentYM)){ alert('この月のシフトがまだありません。先に「自動シフト作成」を行ってください。'); return; }
+  if(pcUserId) savePersonPNG(pcUserId).then(fn=>fn && toast(`「${fn}」を保存しました（ダウンロードフォルダ）`));
+};
+document.getElementById('pcCanvas').onclick = e=>{
+  if(!pcUserId) return;
+  const cv = e.currentTarget, rect = cv.getBoundingClientRect();
+  const lx = (e.clientX - rect.left) * PC.W / rect.width;
+  const ly = (e.clientY - rect.top) * (cv.height/PC.S) / rect.height;
+  const d = personCalendarHit(state.currentYM, lx, ly);
+  if(d) openDayModal(pcUserId, d);
+};
+// 日付の画面（通所の切り替え＋備考）
+let dayEdit = null;
+function openDayModal(uid, d){
+  dayEdit = {uid, d};
+  document.getElementById('dmNote').value = noteOf(state.currentYM, uid, d);
+  renderDayModal();
+  document.getElementById('dayModal').classList.add('show');
+  setTimeout(()=>document.getElementById('dmNote').focus(), 50);
+}
+function renderDayModal(){
+  const ym = state.currentYM, {uid, d} = dayEdit, u = findUser(uid);
+  const [, mo] = ymParts(ym), info = dayInfo(ym,d);
+  const on = (state.months[ym]?.assign[uid]||[]).includes(d);
+  document.getElementById('dmTitle').textContent = `${mo}月${d}日（${WD[weekday(ym,d)]}）　${u?u.name:''}さん`;
+  document.getElementById('dmState').innerHTML = !info.open
+    ? `<span class="hint">この日は事業所の休み（${esc(info.label)}）です。備考だけ入れられます。</span>`
+    : `現在：<b style="font-size:20px;color:${on?'var(--blue)':'#777'}">${on?'〇 通所':'休み'}</b>`;
+  const tb = document.getElementById('dmToggle');
+  tb.classList.toggle('hidden', !info.open);
+  tb.textContent = on ? '休みにする' : '通所にする（〇）';
+}
+function closeDayModal(){ document.getElementById('dayModal').classList.remove('show'); dayEdit = null; }
+document.getElementById('dmToggle').onclick = ()=>{ if(!dayEdit) return; toggleCell(dayEdit.uid, dayEdit.d); renderDayModal(); };
+document.getElementById('dmSave').onclick = ()=>{
+  if(!dayEdit) return;
+  setNote(state.currentYM, dayEdit.uid, dayEdit.d, document.getElementById('dmNote').value);
+  closeDayModal(); renderShift(); renderPerson(); toast('備考を保存しました');
+};
+document.getElementById('dmClear').onclick = ()=>{
+  if(!dayEdit) return;
+  setNote(state.currentYM, dayEdit.uid, dayEdit.d, '');
+  closeDayModal(); renderShift(); renderPerson(); toast('備考を消しました');
+};
+document.getElementById('dmClose').onclick = ()=>{ closeDayModal(); renderPerson(); };
+document.getElementById('dayModal').onclick = e=>{ if(e.target.id==='dayModal'){ closeDayModal(); renderPerson(); } };
+document.getElementById('dmNote').onkeydown = e=>{ if(e.key==='Enter') document.getElementById('dmSave').click(); };
+
+// 通所日の設定
+document.getElementById('mcal').onchange = e=>{
+  const t = e.target, ym = state.currentYM;
+  if(t.dataset.sat) setCal(ym, 'sat', Number(t.dataset.sat), t.checked);
+  if(t.dataset.closed) setCal(ym, 'closed', Number(t.dataset.closed), t.checked);
+};
+document.getElementById('btnSatAll').onclick = ()=>{
+  const ym = state.currentYM, c = state.cal[ym] || (state.cal[ym] = {sat:[], closed:[]});
+  c.sat = []; for(let d=1; d<=daysIn(ym); d++) if(weekday(ym,d)===6 && !holidayName(ym,d)) c.sat.push(d);
+  save(); renderCal();
+};
+document.getElementById('btnSatNone').onclick = ()=>{
+  const ym = state.currentYM, c = state.cal[ym] || (state.cal[ym] = {sat:[], closed:[]});
+  c.sat = []; save(); renderCal();
+};
+
+// 利用者の選択（画像出力用。シフトには影響しない）
+document.getElementById('userTable').onchange = e=>{
+  const t = e.target;
+  if(t.id==='selHead'){ state.selected = t.checked ? state.users.map(u=>u.id) : []; save(); renderUsers(); return; }
+  if(t.dataset.sel){ setSelected(t.dataset.sel, t.checked); renderUsers(); }
+};
+document.getElementById('btnSelAll').onclick = ()=>{ state.selected = state.users.map(u=>u.id); save(); renderUsers(); };
+document.getElementById('btnSelNone').onclick = ()=>{ state.selected = []; save(); renderUsers(); };
+document.getElementById('btnSelPng').onclick = ()=>openPngModal('simple');
+
+// 画像出力ダイアログ
+document.getElementById('pmOpts').onchange = e=>{ if(e.target.name==='pmode'){ pngMode = e.target.value; renderPngModal(); } };
+document.getElementById('pmGrid').onchange = e=>{ const id=e.target.dataset.psel; if(id){ setSelected(id, e.target.checked); updateSelCount(); if(currentTab==='users') renderUsers(); } };
+document.getElementById('pmAll').onclick = ()=>{ state.selected = state.users.map(u=>u.id); save(); renderPngModal(); if(currentTab==='users') renderUsers(); };
+document.getElementById('pmNone').onclick = ()=>{ state.selected = []; save(); renderPngModal(); if(currentTab==='users') renderUsers(); };
+document.getElementById('pmCancel').onclick = ()=>document.getElementById('pngModal').classList.remove('show');
+document.getElementById('pngModal').onclick = e=>{ if(e.target.id==='pngModal') e.target.classList.remove('show'); };
+document.getElementById('pmSave').onclick = async ()=>{
+  if(pngMode==='table'){ exportTablePNG(); document.getElementById('pngModal').classList.remove('show'); return; }
+  const ok = pngMode==='simple' ? await exportListPNG() : pngMode==='person' ? await exportPersonPNGs(state.selected) : await exportCalendarPNG(pngMode);
+  if(ok) document.getElementById('pngModal').classList.remove('show');
+};
+document.getElementById('btnClearMonth').onclick = ()=>{
+  const ym = state.currentYM;
+  if(!state.months[ym]){ toast('この月のシフトはありません'); return; }
+  if(confirm(`${ymLabel(ym)}のシフトを消去します。よろしいですか？`)){ delete state.months[ym]; save(); render(); }
+};
+document.getElementById('shiftTable').onclick = e=>{
+  const td = e.target.closest('td.c'); if(!td) return;
+  toggleCell(td.dataset.u, Number(td.dataset.d));
+};
+document.getElementById('btnAddUser').onclick = ()=>openUserModal(null);
+document.getElementById('userTable').onclick = e=>{
+  const b = e.target.closest('button'); if(!b) return;
+  if(b.dataset.edit) openUserModal(b.dataset.edit);
+  if(b.dataset.pcal){ pcUserId = b.dataset.pcal; shiftView = 'person'; currentTab = 'shift'; render(); }
+  if(b.dataset.del) deleteUser(b.dataset.del);
+  const mv = (i,j)=>{ const a=state.users; [a[i],a[j]]=[a[j],a[i]]; save(); render(); };
+  if(b.dataset.up) mv(+b.dataset.up, +b.dataset.up-1);
+  if(b.dataset.down) mv(+b.dataset.down, +b.dataset.down+1);
+};
+document.getElementById('umWd').onchange = e=>{
+  const i = Number(e.target.dataset.wd);
+  editing.ngWeekdays = e.target.checked ? [...new Set([...editing.ngWeekdays,i])] : editing.ngWeekdays.filter(w=>w!==i);
+  renderModalParts();
+};
+document.getElementById('umCal').onclick = e=>{
+  const td = e.target.closest('td.d'); if(!td) return;
+  const s = dateStr(calYM, Number(td.dataset.cd));
+  editing.ngDates = editing.ngDates.includes(s) ? editing.ngDates.filter(x=>x!==s) : [...editing.ngDates, s];
+  renderModalParts();
+};
+document.getElementById('umChips').onclick = e=>{
+  const s = e.target.dataset.rmd; if(!s) return;
+  editing.ngDates = editing.ngDates.filter(x=>x!==s); renderModalParts();
+};
+document.getElementById('umCalPrev').onclick = ()=>{ calYM = addMonth(calYM,-1); renderModalParts(); };
+document.getElementById('umCalNext').onclick = ()=>{ calYM = addMonth(calYM,1); renderModalParts(); };
+document.getElementById('umSave').onclick = saveUserModal;
+document.getElementById('umCancel').onclick = closeUserModal;
+document.getElementById('userModal').onclick = e=>{ if(e.target.id==='userModal') closeUserModal(); };
+document.getElementById('umName').onkeydown = e=>{ if(e.key==='Enter') saveUserModal(); };
+document.getElementById('btnCap').onclick = ()=>{
+  const v = parseInt(document.getElementById('capInput').value,10);
+  if(isNaN(v) || v<1 || v>200){ alert('定員は1〜200の数字で入力してください。'); return; }
+  const t = parseInt(document.getElementById('dtInput').value,10);
+  if(isNaN(t) || t<0 || t>v){ alert(`1日の目標人数は0〜${v}の数字で入力してください。`); return; }
+  state.capacity = v; state.dailyTarget = t; save(); toast(`定員${v}人・目標${t}人にしました`);
+};
+document.getElementById('cwSel').onchange = e=>{
+  const w = Number(e.target.dataset.cw); if(!w) return;
+  const s = new Set(state.closedWeekdays); e.target.checked ? s.add(w) : s.delete(w);
+  state.closedWeekdays = [...s].sort(); save(); renderSettings();
+  toast(`休業曜日：${state.closedWeekdays.map(x=>WD[x]).join('・')||'なし'}（作成済みの月は自動シフト作成をやり直してください）`);
+};
+document.getElementById('btnBackup').onclick = backup;
+document.getElementById('btnRestore').onclick = ()=>document.getElementById('restoreFile').click();
+document.getElementById('restoreFile').onchange = e=>{ if(e.target.files[0]) restore(e.target.files[0]); e.target.value=''; };
+document.getElementById('monthTable').onclick = e=>{
+  const b = e.target.closest('button'); if(!b) return;
+  if(b.dataset.open){ state.currentYM = b.dataset.open; currentTab='shift'; save(); render(); }
+  if(b.dataset.delm && confirm(`${ymLabel(b.dataset.delm)}のシフトを削除しますか？`)){ delete state.months[b.dataset.delm]; save(); render(); }
+};
+document.getElementById('btnWipe').onclick = ()=>{
+  if(!confirm('利用者とシフトをすべて削除します。元に戻せません。\n（必要なら先に「バックアップを保存」してください）\n\n削除してよろしいですか？')) return;
+  const cap = state.capacity, ym = state.currentYM, cal = state.cal;
+  state = defaultState(); state.capacity = cap; state.currentYM = ym; state.cal = cal;   // 通所日の設定は残す
+  save(); currentTab='users'; render(); toast('すべて削除しました。利用者を登録してください');
+};
+document.getElementById('btnSample').onclick = ()=>{
+  if(!confirm('現在の利用者とシフトを消して、サンプルデータを読み込みます。よろしいですか？')) return;
+  const ym = state.currentYM;
+  state = defaultState(); state.currentYM = ym; loadSample(); save(); currentTab='shift'; render();
+};
+
+/* =========================================================
+   GitHub同期（スマホ・パソコンのどこからでも同じデータを使う）
+   データは「非公開リポジトリ」の JSON ファイルに保存する。
+   この端末にも控え（localStorage）を残すので、圏外でも使える。
+   ========================================================= */
+const SYNC_CFG_KEY  = 'btype-shift-sync-cfg';    // {owner, repo, token, path, branch}（この端末だけ）
+const SYNC_META_KEY = 'btype-shift-sync-meta';   // {sha, pending, lastHash, lastSyncedAt}
+let syncCfg  = readJSON(SYNC_CFG_KEY)  || null;
+let syncMeta = readJSON(SYNC_META_KEY) || {sha:null, pending:false, lastHash:null, lastSyncedAt:0};
+let syncTimer = null, syncBusy = false, syncStatus = 'off', syncMsg = '';
+function readJSON(k){ try{ return JSON.parse(localStorage.getItem(k)); }catch(e){ return null; } }
+function writeJSON(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+const syncOn = () => !!(syncCfg && syncCfg.owner && syncCfg.repo && syncCfg.token);
+// 端末ごとの表示状態（表示中の年月・画像用の選択）は比較・同期の対象外
+function dataHash(st){
+  const {currentYM, selected, updatedAt, ...rest} = st;
+  return JSON.stringify(rest);
+}
+const b64enc = str => { const bytes = new TextEncoder().encode(str); let bin=''; for(let i=0;i<bytes.length;i+=0x8000) bin += String.fromCharCode.apply(null, bytes.subarray(i,i+0x8000)); return btoa(bin); };
+const b64dec = b64 => { const bin = atob(b64.replace(/\s/g,'')); const bytes = new Uint8Array(bin.length); for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i); return new TextDecoder().decode(bytes); };
+
+async function ghFetch(path, method='GET', body){
+  const url = `https://api.github.com${path}`;
+  const res = await fetch(url, {
+    method, cache:'no-store',
+    headers:{'Authorization':`Bearer ${syncCfg.token}`, 'Accept':'application/vnd.github+json', 'X-GitHub-Api-Version':'2022-11-28', ...(body?{'Content-Type':'application/json'}:{})},
+    body: body ? JSON.stringify(body) : undefined
+  });
+  let json = null; try{ json = await res.json(); }catch(e){}
+  return {status:res.status, json};
+}
+const filePath = () => `/repos/${encodeURIComponent(syncCfg.owner)}/${encodeURIComponent(syncCfg.repo)}/contents/${(syncCfg.path||'shift-data.json').split('/').map(encodeURIComponent).join('/')}`;
+function ghError(r){
+  if(r.status===401) return 'トークンが正しくないか、期限切れです';
+  if(r.status===403) return 'トークンに書き込みの権限がありません（Contents：Read and write が必要です）';
+  if(r.status===404) return 'リポジトリが見つかりません（ユーザー名・リポジトリ名・トークンの対象リポジトリを確認してください）';
+  return `GitHubとの通信でエラーが発生しました（${r.status}）`;
+}
+// GitHub上のデータを取得 → {exists, data, sha}
+async function pullRemote(){
+  const r = await ghFetch(filePath() + `?ref=${encodeURIComponent(syncCfg.branch||'main')}`);
+  if(r.status===404){
+    const repo = await ghFetch(`/repos/${encodeURIComponent(syncCfg.owner)}/${encodeURIComponent(syncCfg.repo)}`);
+    if(repo.status===200) return {exists:false};
+    throw new Error(ghError(repo));
+  }
+  if(r.status!==200) throw new Error(ghError(r));
+  let text;
+  if(r.json.content) text = b64dec(r.json.content);
+  else { // 1MBを超える場合
+    const raw = await ghFetch(`/repos/${encodeURIComponent(syncCfg.owner)}/${encodeURIComponent(syncCfg.repo)}/git/blobs/${r.json.sha}`);
+    text = b64dec(raw.json.content);
+  }
+  return {exists:true, data:JSON.parse(text), sha:r.json.sha};
+}
+async function putRemote(sha){
+  const body = {message:`シフトデータ更新 ${new Date().toLocaleString('ja-JP')}`, content:b64enc(JSON.stringify(state, null, 1)), branch:syncCfg.branch||'main'};
+  if(sha) body.sha = sha;
+  return ghFetch(filePath(), 'PUT', body);
+}
+function setSync(status, msg){
+  syncStatus = status; syncMsg = msg || '';
+  const el = document.getElementById('syncBadge');
+  if(el){
+    const t = {off:'同期オフ', ok:'☁ 同期済み', busy:'☁ 同期中…', wait:'☁ 送信待ち', err:'⚠ 同期エラー', offline:'⚠ オフライン'}[status];
+    el.textContent = t; el.className = 'sync-badge s-' + status; el.title = syncMsg || t;
+  }
+  const st = document.getElementById('syncState');
+  if(st) st.innerHTML = syncOn()
+    ? `<b>${esc({ok:'同期済み', busy:'同期中…', wait:'送信待ち', err:'同期エラー', offline:'オフライン（電波が戻ったら自動で送信します）', off:'同期オフ'}[status])}</b>${syncMsg?'：'+esc(syncMsg):''}` +
+      (syncMeta.lastSyncedAt ? `<br><span class="hint">最終同期：${new Date(syncMeta.lastSyncedAt).toLocaleString('ja-JP')}</span>` : '')
+    : '同期していません（この端末の中だけに保存されています）';
+}
+function saveMeta(){ writeJSON(SYNC_META_KEY, syncMeta); }
+// 他の端末のデータを取り込む（表示中の年月・選択はこの端末のまま）
+function adoptRemote(data, sha){
+  const keepYM = state ? state.currentYM : null, keepSel = state ? state.selected : [];
+  state = data; normalize();
+  if(keepYM) state.currentYM = keepYM;
+  state.selected = (keepSel||[]).filter(id=>state.users.some(u=>u.id===id));
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){}
+  syncMeta = {sha, pending:false, lastHash:dataHash(state), lastSyncedAt:Date.now()}; saveMeta();
+}
+// save() から呼ばれる：内容が変わっていたら少し待ってGitHubへ送る
+function syncAfterSave(){
+  if(!syncOn()) return;
+  if(dataHash(state) === syncMeta.lastHash && !syncMeta.pending) return;   // 年月の移動など、データが変わっていない
+  syncMeta.pending = true; saveMeta();
+  setSync('wait');
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(()=>pushNow(), 2500);
+}
+async function pushNow(){
+  if(!syncOn() || syncBusy) return;
+  if(!navigator.onLine){ setSync('offline'); return; }
+  syncBusy = true; setSync('busy');
+  try{
+    let r = await putRemote(syncMeta.sha);
+    if(r.status===409 || r.status===422 || (r.status===404 && syncMeta.sha)){
+      // 他の端末が先に更新していた
+      const rem = await pullRemote();
+      if(rem.exists && dataHash(rem.data) !== syncMeta.lastHash){
+        const useRemote = confirm('他の端末（スマホ・パソコン）で、このあとに別の変更が保存されています。\n\n' +
+          '［OK］＝ 他の端末の内容を使う（この端末で今した変更は取り消し）\n' +
+          '［キャンセル］＝ この端末の内容で上書きする');
+        if(useRemote){
+          writeJSON('btype-shift-conflict-backup', state);   // 念のため控えを残す
+          adoptRemote(rem.data, rem.sha); render(); setSync('ok', '他の端末の内容を読み込みました');
+          return;
+        }
+      }
+      r = await putRemote(rem.exists ? rem.sha : null);
+    }
+    if(r.status===200 || r.status===201){
+      syncMeta = {sha:r.json.content.sha, pending:false, lastHash:dataHash(state), lastSyncedAt:Date.now()}; saveMeta();
+      setSync('ok');
+    }else{
+      setSync('err', ghError(r));
+    }
+  }catch(e){
+    setSync(navigator.onLine ? 'err' : 'offline', navigator.onLine ? e.message : '');
+  }finally{
+    syncBusy = false;
+    if(syncMeta.pending && syncStatus==='ok') syncAfterSave();   // 送信中にさらに変更があった
+  }
+}
+// 他の端末の変更を確認して取り込む（起動時・画面に戻ったとき・1分ごと）
+async function pullNow(silent){
+  if(!syncOn() || syncBusy) return;
+  if(syncMeta.pending){ pushNow(); return; }       // 未送信の変更があれば先に送る
+  if(!navigator.onLine){ setSync('offline'); return; }
+  syncBusy = true; if(!silent) setSync('busy');
+  try{
+    const rem = await pullRemote();
+    if(!rem.exists){ syncBusy=false; syncMeta.pending = true; saveMeta(); return pushNow(); }
+    if(rem.sha !== syncMeta.sha){
+      const changed = dataHash(rem.data) !== dataHash(state);
+      adoptRemote(rem.data, rem.sha);
+      if(changed){ render(); toast('他の端末で保存された変更を読み込みました'); }
+    }
+    syncMeta.lastSyncedAt = Date.now(); saveMeta();
+    setSync('ok');
+  }catch(e){
+    setSync(navigator.onLine ? 'err' : 'offline', navigator.onLine ? e.message : '');
+  }finally{ syncBusy = false; }
+}
+// 初めて接続するとき
+async function connectSync(cfg){
+  const prev = syncCfg;
+  syncCfg = {owner:cfg.owner.trim(), repo:cfg.repo.trim(), token:cfg.token.trim(), path:(cfg.path||'shift-data.json').trim(), branch:(cfg.branch||'main').trim()};
+  setSync('busy', '接続を確認しています');
+  try{
+    const repo = await ghFetch(`/repos/${encodeURIComponent(syncCfg.owner)}/${encodeURIComponent(syncCfg.repo)}`);
+    if(repo.status!==200) throw new Error(ghError(repo));
+    if(repo.json && repo.json.private === false &&
+       !confirm('このリポジトリは「公開（Public）」です。利用者の名前が誰でも見られる状態になります。\n\n非公開（Private）のリポジトリを使うことを強くおすすめします。\nそれでも続けますか？')) throw new Error('中止しました（非公開リポジトリを指定してください）');
+    const rem = await pullRemote();
+    writeJSON(SYNC_CFG_KEY, syncCfg);
+    if(rem.exists){
+      const use = confirm(`GitHubに保存済みのデータがあります（利用者 ${rem.data.users.length}人、シフト ${Object.keys(rem.data.months||{}).length}か月分）。\n\n` +
+        '［OK］＝ GitHubのデータを使う（ほかの端末と同じデータになります）\n［キャンセル］＝ この端末のデータでGitHubを上書きする');
+      if(use){ adoptRemote(rem.data, rem.sha); render(); setSync('ok', 'GitHubのデータを読み込みました'); return true; }
+      syncMeta = {sha:rem.sha, pending:true, lastHash:null, lastSyncedAt:0}; saveMeta();
+    }else{
+      syncMeta = {sha:null, pending:true, lastHash:null, lastSyncedAt:0}; saveMeta();
+    }
+    await pushNow();
+    return syncStatus==='ok';
+  }catch(e){
+    syncCfg = prev; setSync(syncOn()?'err':'off', e.message);
+    alert('接続できませんでした。\n' + e.message);
+    return false;
+  }
+}
+function disconnectSync(){
+  syncCfg = null; localStorage.removeItem(SYNC_CFG_KEY);
+  syncMeta = {sha:null, pending:false, lastHash:null, lastSyncedAt:0}; saveMeta();
+  setSync('off');
+}
+// 設定コード（他の端末へ設定を移すための文字列）
+const makeSetupCode = () => 'BSHIFT1:' + b64enc(JSON.stringify(syncCfg));
+function parseSetupCode(code){
+  const c = String(code).trim().replace(/^BSHIFT1:/,'');
+  const o = JSON.parse(b64dec(c));
+  if(!o.owner || !o.repo || !o.token) throw new Error('設定コードが正しくありません');
+  return o;
+}
+function renderSyncPanel(){
+  const f = id => document.getElementById(id);
+  if(!f('syOwner')) return;
+  f('syOwner').value  = syncCfg ? syncCfg.owner : (f('syOwner').value||'');
+  f('syRepo').value   = syncCfg ? syncCfg.repo  : (f('syRepo').value||'shift-data');
+  f('syToken').value  = syncCfg ? syncCfg.token : '';
+  f('syPath').value   = syncCfg ? syncCfg.path  : 'shift-data.json';
+  f('syBranch').value = syncCfg ? syncCfg.branch: 'main';
+  f('syConnected').classList.toggle('hidden', !syncOn());
+  f('btnSyConnect').textContent = syncOn() ? '設定を保存して再接続' : '接続する';
+  setSync(syncOn() ? syncStatus : 'off', syncMsg);
+}
+function initSyncEvents(){
+  const f = id => document.getElementById(id);
+  f('syncBadge').onclick = ()=>{ currentTab='settings'; render(); setTimeout(()=>f('syncPanel').scrollIntoView({behavior:'smooth'}),50); };
+  f('btnSyConnect').onclick = async ()=>{
+    const cfg = {owner:f('syOwner').value, repo:f('syRepo').value, token:f('syToken').value, path:f('syPath').value, branch:f('syBranch').value};
+    if(!cfg.owner.trim() || !cfg.repo.trim() || !cfg.token.trim()){ alert('ユーザー名・リポジトリ名・トークンを入力してください。'); return; }
+    if(await connectSync(cfg)) toast('GitHubと接続しました。これからは自動で同期されます');
+    renderSyncPanel();
+  };
+  f('btnSyNow').onclick = async ()=>{ await pullNow(false); renderSyncPanel(); if(syncStatus==='ok') toast('最新の状態です'); };
+  f('btnSyOff').onclick = ()=>{ if(confirm('この端末の同期をやめますか？\n（GitHub上のデータとこの端末のデータは消えません）')){ disconnectSync(); renderSyncPanel(); } };
+  f('btnSyCode').onclick = ()=>{
+    f('syCodeOut').value = makeSetupCode(); f('syCodeBox').classList.remove('hidden'); f('syCodeOut').select();
+  };
+  f('btnSyCopy').onclick = async ()=>{
+    try{ await navigator.clipboard.writeText(f('syCodeOut').value); toast('設定コードをコピーしました'); }
+    catch(e){ f('syCodeOut').select(); document.execCommand('copy'); toast('設定コードをコピーしました'); }
+  };
+  f('btnSyUseCode').onclick = async ()=>{
+    let cfg; try{ cfg = parseSetupCode(f('syCodeIn').value); }catch(e){ alert('設定コードが正しくありません。もう一度コピーして貼り付けてください。'); return; }
+    if(await connectSync(cfg)){ f('syCodeIn').value=''; toast('GitHubと接続しました'); }
+    renderSyncPanel();
+  };
+  // 画面に戻ったとき・電波が戻ったとき・1分ごとに確認
+  document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='visible') pullNow(true); else if(syncMeta.pending){ clearTimeout(syncTimer); pushNow(); } });
+  window.addEventListener('online', ()=>pullNow(true));
+  window.addEventListener('offline', ()=>syncOn() && setSync('offline'));
+  setInterval(()=>{ if(document.visibilityState==='visible') pullNow(true); }, 60000);
+  window.addEventListener('beforeunload', e=>{ if(syncOn() && syncMeta.pending){ pushNow(); e.preventDefault(); e.returnValue=''; } });
+}
+
+load();
+initSyncEvents();
+render();
+renderSyncPanel();
+if(syncOn()){ setSync('busy'); pullNow(false); }
+</script>
+</body>
+</html>
